@@ -1,0 +1,7 @@
+[package]
+name = "ultrastar-txt"
+version = "0.1.0"
+authors = ["Robin Nehls <nehls@mi.fu-berlin.de>"]
+
+[dependencies]
+regex = "0.2"
