@@ -114,7 +114,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
                 found_audio_path = true;
             },
             "GAP" => {
-                header.gap = match value.parse() {
+                header.gap = match value.replace(",", ".").parse() {
                     Ok(x) => x,
                     Err(_) => return Err("invalid GAP"),
                 };
@@ -124,7 +124,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
                 found_gap = true;
             },
             "BPM" => {
-                header.bpm = match value.parse() {
+                header.bpm = match value.replace(",", ".").parse() {
                     Ok(x) => x,
                     Err(_) => return Err("invalid BPM"),
                 };
@@ -145,7 +145,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
                 header.video_path = Some(PathBuf::from(value));
             },
             "VIDEOGAP" => {
-                header.video_gap = match value.parse() {
+                header.video_gap = match value.replace(",", ".").parse() {
                     Ok(x) => Some(x),
                     Err(_) => {
                         println!("Warning: Invalid video gap");
@@ -194,6 +194,17 @@ Ok(header)
 }
 
 pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, &str> {
+
+    let re = Regex::new(r"([A-Z3]*):(.*)").unwrap();
+
+    for line in txt_str.lines() {
+        let cap = match re.captures(line) {
+            Some(x) => x,
+            None => break,
+        };
+        let key = cap.get(1).unwrap().as_str();
+        let value = cap.get(2).unwrap().as_str();
+    }
     Ok(Vec::new())
 
 }
