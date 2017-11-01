@@ -193,18 +193,93 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
 Ok(header)
 }
 
-pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, &str> {
-
-    let re = Regex::new(r"([A-Z3]*):(.*)").unwrap();
-
-    for line in txt_str.lines() {
-        let cap = match re.captures(line) {
-            Some(x) => x,
-            None => break,
-        };
-        let key = cap.get(1).unwrap().as_str();
-        let value = cap.get(2).unwrap().as_str();
+pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, String> {
+    lazy_static! {
+        static ref LINE_RE: Regex = Regex::new("- ([0-9]*)").unwrap();
+        //TODO: figure out if some of these numbers can be negative (should not, but there might be strange txts)
+        static ref NOTE_RE: Regex = Regex::new("([:*F]) ([0-9]*) ([0-9]*) ([0-9]*) (.*)").unwrap();
     }
-    Ok(Vec::new())
+
+    let mut lines_vec = Vec::new();
+    let mut current_line = Line {
+        start: 0,
+        notes: Vec::new(),
+    };
+
+    let mut line_count = 0;
+    for line in txt_str.lines() {
+        line_count += 1;
+
+        let first_char = match line.chars().nth(0) {
+            Some(x) => x,
+            None => return Err(format!("Could not parse line: {}", line_count)),
+        };
+
+        // ignore header
+        if first_char == '#' {
+            continue;
+        }
+
+        // stop parsing after end symbol
+        if first_char == 'E' {
+            lines_vec.push(current_line);
+            break;
+        }
+
+        // current line is a line break
+        if LINE_RE.is_match(line) {
+            // push old line to the Line vector and prepare new line
+            lines_vec.push(current_line);
+            let cap = LINE_RE.captures(line).unwrap();
+            let line_start = match cap.get(1).unwrap().as_str().parse() {
+                Ok(x) => x,
+                Err(_) => return Err(format!("Could not parse line start in line: {}", line_count)),
+            };
+            current_line = Line {
+                start: line_start,
+                notes: Vec::new(),
+            };
+            continue;
+        }
+
+        // current line is a note
+        if NOTE_RE.is_match(line) {
+            let cap = NOTE_RE.captures(line).unwrap();
+            let note_type = match cap.get(1).unwrap().as_str() {
+                ":" => NoteType::Regular,
+                "*" => NoteType::Golden,
+                "F" => NoteType::Freestyle,
+                _ => return Err(format!("Could not parse note type in line: {}", line_count)),
+            };
+            let note_start = match cap.get(2).unwrap().as_str().parse() {
+                Ok(x) => x,
+                Err(_) => return Err(format!("Could not parse note start in line: {}", line_count)),
+            };
+            let note_duration = match cap.get(3).unwrap().as_str().parse() {
+                Ok(x) => x,
+                Err(_) => return Err(format!("Could not parse note duration in line: {}", line_count)),
+            };
+            let note_pitch = match cap.get(4).unwrap().as_str().parse() {
+                Ok(x) => x,
+                Err(_) => return Err(format!("Could not parse note pitch in line: {}", line_count)),
+            };
+            let note_text = cap.get(5).unwrap().as_str();
+
+            let note = Note {
+                notetype: note_type,
+                start: note_start,
+                duration: note_duration,
+                pitch: note_pitch,
+                text: String::from(note_text),
+            };
+            current_line.notes.push(note);
+        }
+        // unknown line
+        else {
+            return Err(format!("Could not parse line: {}", line_count));
+        }
+
+    }
+    Ok(lines_vec)
 
 }
