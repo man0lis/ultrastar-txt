@@ -5,3 +5,4 @@ authors = ["Robin Nehls <nehls@mi.fu-berlin.de>"]
 
 [dependencies]
 regex = "0.2"
+lazy_static = "0.2"

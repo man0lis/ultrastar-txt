@@ -1,3 +1,4 @@
+#[macro_use] extern crate lazy_static;
 extern crate regex;
 
 use std::path::PathBuf;
@@ -82,7 +83,9 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
 
     let mut header = get_empty_header();
 
-    let re = Regex::new(r"#([A-Z3]*):(.*)").unwrap();
+    lazy_static! {
+        static ref re: Regex = Regex::new(r"#([A-Z3]*):(.*)").unwrap();
+    }
 
     for line in txt_str.lines() {
         let cap = match re.captures(line) {
