@@ -70,7 +70,7 @@ fn get_simple_txt_lines() -> Vec<Line> {
             start: 8,
             duration: 4,
             pitch: 59,
-            text: String::from("'m"),
+            text: String::from("'m "),
         },
         Note {
             notetype: NoteType::Golden,
@@ -110,7 +110,7 @@ fn get_simple_txt_lines() -> Vec<Line> {
             start: 32,
             duration: 4,
             pitch: 59,
-            text: String::from("'m"),
+            text: String::from("'m "),
         },
         Note {
             notetype: NoteType::Freestyle,
