@@ -173,7 +173,6 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
                         None
                     },
                 };
-                println!("Set video_gap to: {:?}", header.video_gap);
             },
             "RELATIVE" => {
                 header.relative = match value {
@@ -183,9 +182,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
                     false
                 },
             };
-            println!("Set video_gap to: {:?}", header.video_gap);
         },
-
         _ => println!("{}",key),
     };
 
