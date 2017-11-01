@@ -84,11 +84,11 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
     let mut header = get_empty_header();
 
     lazy_static! {
-        static ref re: Regex = Regex::new(r"#([A-Z3]*):(.*)").unwrap();
+        static ref RE: Regex = Regex::new(r"#([A-Z3]*):(.*)").unwrap();
     }
 
     for line in txt_str.lines() {
-        let cap = match re.captures(line) {
+        let cap = match RE.captures(line) {
             Some(x) => x,
             None => break,
         };
