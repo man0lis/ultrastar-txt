@@ -74,7 +74,7 @@ fn get_empty_header() -> Header {
     }
 }
 
-pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
+pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, String> {
     let mut found_artist = false;
     let mut found_title = false;
     let mut found_bpm = false;
@@ -87,7 +87,9 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
         static ref RE: Regex = Regex::new(r"#([A-Z3]*):(.*)").unwrap();
     }
 
+    let mut line_count = 0;
     for line in txt_str.lines() {
+        line_count += 1;
         let cap = match RE.captures(line) {
             Some(x) => x,
             None => break,
@@ -98,41 +100,41 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
             "TITLE" => {
                 header.title = String::from(value);
                 if found_title {
-                    return Err("multiple TITLE tags found")
+                    return Err(format!("additional TITLE tag found in line: {}", line_count));
                 }
                 found_title = true;
             },
             "ARTIST" => {
                 header.artist = String::from(value);
                 if found_artist {
-                    return Err("multiple ARTIST tags found")
+                    return Err(format!("additional ARTIST tag found in line: {}", line_count));
                 }
                 found_artist = true;
             },
             "MP3" => {
                 header.audio_path = PathBuf::from(value);
                 if found_audio_path {
-                    return Err("multiple MP3 tags found")
+                    return Err(format!("additional MP3 tag found in line: {}", line_count));
                 }
                 found_audio_path = true;
             },
             "GAP" => {
                 header.gap = match value.replace(",", ".").parse() {
                     Ok(x) => x,
-                    Err(_) => return Err("invalid GAP"),
+                    Err(_) => return Err(format!("invalid GAP in line: {}", line_count)),
                 };
                 if found_gap {
-                    return Err("multiple GAP tags found")
+                    return Err(format!("additional GAP tag found in line: {}", line_count));
                 }
                 found_gap = true;
             },
             "BPM" => {
                 header.bpm = match value.replace(",", ".").parse() {
                     Ok(x) => x,
-                    Err(_) => return Err("invalid BPM"),
+                    Err(_) => return Err(format!("invalid BPM in line: {}", line_count)),
                 };
                 if found_bpm {
-                    return Err("multiple BPM tags found")
+                    return Err(format!("additional BPM tag found in line: {}", line_count));
                 }
                 found_bpm = true;
             },
@@ -151,28 +153,25 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
                 header.video_gap = match value.replace(",", ".").parse() {
                     Ok(x) => Some(x),
                     Err(_) => {
-                        println!("Warning: Invalid video gap");
+                        println!("Warning: Invalid video gap in line: {}", line_count);
                         None
                     },
                 };
             },
             "GENRE" => {
                 header.genre = Some(String::from(value));
-                println!("Set genre to: {:?}", header.genre);
             },
             "EDITION" => {
                 header.edition = Some(String::from(value));
-                println!("Set edition to: {:?}", header.edition);
             },
             "LANGUAGE" => {
                 header.language = Some(String::from(value));
-                println!("Set language to: {:?}", header.language);
             },
             "YEAR" => {
                 header.year = match value.parse() {
                     Ok(x) => Some(x),
                     Err(_) => {
-                        println!("Warning: Invalid year");
+                        println!("Warning: Invalid year in line: {}", line_count);
                         None
                     },
                 };
@@ -181,12 +180,12 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, &str> {
                 header.relative = match value {
                     "YES" => true,
                     "NO" => false,
-                    _ => { println!("Warning: Invalid relative tag");
+                    _ => { println!("Warning: Invalid relative tag in line: {}", line_count);
                     false
                 },
             };
         },
-        _ => println!("{}",key),
+        _ => println!("Warning: unknown tag {} found in line: {}", key, line_count),
     };
 
 }
