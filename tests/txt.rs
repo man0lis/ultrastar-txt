@@ -66,6 +66,12 @@ fn survive_nonstandard_tags() {
 }
 
 #[test]
+fn negative_pitch_in_lines() {
+    let txt = include_str!("txts/negative_pitch_in_lines.txt");
+    assert!(parse_txt_lines_str(txt).is_ok());
+}
+
+#[test]
 fn lower_case_relative() {
     let txt = include_str!("txts/lower_case_relative.txt");
     assert!(parse_txt_header_str(txt).is_ok());
