@@ -78,6 +78,23 @@ fn garbage_line() {
 }
 
 #[test]
+fn empty_optional_tags() {
+    let txt = include_str!("txts/empty_optional_tags.txt");
+    let mut header = get_simple_txt_header();
+    header.relative = None;
+    header.video_path = None;
+    header.cover_path = None;
+    header.background_path = None;
+    header.video_gap = None;
+    header.genre = None;
+    header.edition = None;
+    header.language = None;
+    header.year = None;
+    header.unknown = None;
+    assert_eq!(parse_txt_header_str(txt).unwrap(), header);
+}
+
+#[test]
 fn duplicate_header_artist() {
     let txt = include_str!("txts/duplicate_header_artist.txt");
     assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 3, tag: "ARTIST" }));

@@ -110,6 +110,13 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
         };
         let key = cap.get(1).unwrap().as_str();
         let value = cap.get(2).unwrap().as_str();
+
+
+        if value == "" {
+            //TODO: somehow warn about this
+            continue;
+        }
+
         match key {
             "TITLE" => {
                 if opt_title.is_none() {
