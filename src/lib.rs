@@ -331,6 +331,12 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             break;
         }
 
+        // ignore duett tags for now
+        // TODO: implement duett
+        if first_char == 'P' {
+            continue;
+        }
+
         // current line is a line break
         if LINE_RE.is_match(line) {
             // push old line to the Line vector and prepare new line

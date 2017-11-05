@@ -78,6 +78,12 @@ fn empty_note_text() {
 }
 
 #[test]
+fn survive_duett_tags() {
+    let txt = include_str!("txts/survive_duett_tags.txt");
+    assert!(parse_txt_lines_str(txt).is_ok());
+}
+
+#[test]
 fn negative_pitch_in_lines() {
     let txt = include_str!("txts/negative_pitch_in_lines.txt");
     assert!(parse_txt_lines_str(txt).is_ok());
