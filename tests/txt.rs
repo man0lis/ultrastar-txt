@@ -34,7 +34,7 @@ fn get_simple_txt_header() -> Header {
         bpm: 123.0,
         gap: 666.0,
         audio_path: PathBuf::from("Testfile.mp3"),
-        relative: false,
+        relative: Some(false),
         video_path: Some(PathBuf::from("DLzxrzFCyOs.mp4")),
         cover_path: Some(PathBuf::from("Cover.jpg")),
         background_path: Some(PathBuf::from("BG.jpg")),

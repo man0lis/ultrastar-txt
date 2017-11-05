@@ -24,7 +24,7 @@ pub struct Header {
     pub edition: Option<String>,
     pub language: Option<String>,
     pub year: Option<u32>,
-    pub relative: bool,
+    pub relative: Option<bool>,
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -63,33 +63,23 @@ pub struct Line {
     pub notes: Vec<Note>,
 }
 
-fn get_empty_header() -> Header {
-    Header {
-        artist: String::from(""),
-        title: String::from(""),
-        bpm: std::f32::NAN,
-        gap: std::f32::NAN,
-        audio_path: PathBuf::from(""),
-        cover_path: None,
-        background_path: None,
-        video_path: None,
-        video_gap: None,
-        genre: None,
-        edition: None,
-        language: None,
-        year: None,
-        relative: false,
-    }
-}
+pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
 
-pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, String> {
-    let mut found_artist = false;
-    let mut found_title = false;
-    let mut found_bpm = false;
-    let mut found_gap = false;
-    let mut found_audio_path = false;
+    let mut opt_title = None;
+    let mut opt_artist = None;
+    let mut opt_bpm = None;
+    let mut opt_gap = None;
+    let mut opt_audio_path = None;
 
-    let mut header = get_empty_header();
+    let mut opt_cover_path = None;
+    let mut opt_background_path = None;
+    let mut opt_video_path = None;
+    let mut opt_video_gap = None;
+    let mut opt_genre = None;
+    let mut opt_edition = None;
+    let mut opt_language = None;
+    let mut opt_year = None;
+    let mut opt_relative = None;
 
     lazy_static! {
         static ref RE: Regex = Regex::new(r"#([A-Z3]*):(.*)").unwrap();
@@ -106,98 +96,167 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, String> {
         let value = cap.get(2).unwrap().as_str();
         match key {
             "TITLE" => {
-                header.title = String::from(value);
-                if found_title {
-                    return Err(format!("additional TITLE tag found in line: {}", line_count));
+                if opt_title.is_none() {
+                    opt_title = Some(String::from(value));
                 }
-                found_title = true;
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("TITLE")});
+                }
             },
             "ARTIST" => {
-                header.artist = String::from(value);
-                if found_artist {
-                    return Err(format!("additional ARTIST tag found in line: {}", line_count));
+                if opt_artist.is_none() {
+                    opt_artist = Some(String::from(value));
                 }
-                found_artist = true;
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("ARTIST")});
+                }
             },
             "MP3" => {
-                header.audio_path = PathBuf::from(value);
-                if found_audio_path {
-                    return Err(format!("additional MP3 tag found in line: {}", line_count));
+                if opt_audio_path.is_none() {
+                    opt_audio_path = Some(PathBuf::from(value));
                 }
-                found_audio_path = true;
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("MP3")});
+               }
             },
             "GAP" => {
-                header.gap = match value.replace(",", ".").parse() {
-                    Ok(x) => x,
-                    Err(_) => return Err(format!("invalid GAP in line: {}", line_count)),
-                };
-                if found_gap {
-                    return Err(format!("additional GAP tag found in line: {}", line_count));
+                if opt_gap.is_none() {
+                    opt_gap = match value.replace(",", ".").parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("GAP")}),
+                    };
                 }
-                found_gap = true;
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("GAP")});
+                }
             },
             "BPM" => {
-                header.bpm = match value.replace(",", ".").parse() {
-                    Ok(x) => x,
-                    Err(_) => return Err(format!("invalid BPM in line: {}", line_count)),
-                };
-                if found_bpm {
-                    return Err(format!("additional BPM tag found in line: {}", line_count));
+                if opt_bpm.is_none() {
+                    opt_bpm = match value.replace(",", ".").parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("BPM")}),
+                    };
                 }
-                found_bpm = true;
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("BPM")});
+                }
             },
 
             // Optional Header fields
             "COVER" => {
-                header.cover_path = Some(PathBuf::from(value));
+                if opt_cover_path.is_none() {
+                    opt_cover_path = Some(PathBuf::from(value));
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("COVER")});
+                }
             },
             "BACKGROUND" => {
-                header.background_path = Some(PathBuf::from(value));
+                if opt_background_path.is_none() {
+                    opt_background_path = Some(PathBuf::from(value));
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("BACKGROUND")});
+                }
             },
             "VIDEO" => {
-                header.video_path = Some(PathBuf::from(value));
+                if opt_video_path.is_none() {
+                    opt_video_path = Some(PathBuf::from(value));
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("VIDEO")});
+                }
             },
             "VIDEOGAP" => {
-                header.video_gap = match value.replace(",", ".").parse() {
-                    Ok(x) => Some(x),
-                    Err(_) => {
-                        println!("Warning: Invalid video gap in line: {}", line_count);
-                        None
-                    },
-                };
+                if opt_video_gap.is_none() {
+                    opt_video_gap = match value.replace(",", ".").parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("VIDEOGAP")}),
+                    };
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("VIDEOGAP")});
+                }
             },
             "GENRE" => {
-                header.genre = Some(String::from(value));
+                if opt_genre.is_none() {
+                    opt_genre = Some(String::from(value));
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("GENRE")});
+                }
             },
             "EDITION" => {
-                header.edition = Some(String::from(value));
+                if opt_edition.is_none() {
+                    opt_edition = Some(String::from(value));
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("EDITION")});
+                }
             },
             "LANGUAGE" => {
-                header.language = Some(String::from(value));
+                if opt_language.is_none() {
+                    opt_language = Some(String::from(value));
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("LANGUAGE")});
+                }
             },
             "YEAR" => {
-                header.year = match value.parse() {
-                    Ok(x) => Some(x),
-                    Err(_) => {
-                        println!("Warning: Invalid year in line: {}", line_count);
-                        None
-                    },
-                };
+                if opt_year.is_none() {
+                    opt_year = match value.parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("YEAR")}),
+                    };
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("YEAR")});
+                }
             },
             "RELATIVE" => {
-                header.relative = match value {
-                    "YES" => true,
-                    "NO" => false,
-                    _ => { println!("Warning: Invalid relative tag in line: {}", line_count);
-                    false
-                },
-            };
-        },
-        _ => println!("Warning: unknown tag {} found in line: {}", key, line_count),
-    };
+                if opt_relative.is_none() {
+                    opt_relative = match value {
+                        "YES" => Some(true),
+                        "NO" => Some(false),
+                        _ => return Err(ParserError::ValueError{line: line_count, field: String::from("RELATIVE")}),
+                    }
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("RELATIVE")});
+                }
+            },
+            // TODO: use hashmap to store unknown tags
+            _ => println!("Warning: unknown tag {} found in line: {}", key, line_count),
+        };
 
-}
-Ok(header)
+    }
+
+    // build header from Options
+    if let (Some(title), Some(artist), Some(bpm), Some(gap), Some(auto_path)) = (opt_title, opt_artist, opt_bpm, opt_gap, opt_audio_path) {
+        let header = Header {
+            title: title,
+            artist: artist,
+            bpm: bpm,
+            gap: gap,
+            audio_path: auto_path,
+
+            cover_path: opt_cover_path,
+            background_path: opt_background_path,
+            video_path: opt_video_path,
+            video_gap: opt_video_gap,
+            genre: opt_genre,
+            edition: opt_edition,
+            language: opt_language,
+            year: opt_year,
+            relative: opt_relative,
+        };
+        // header complete
+        Ok(header)
+    }
+    else {
+        // essential field is missing
+        Err(ParserError::MissingEssential)
+    }
 }
 
 pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, String> {
