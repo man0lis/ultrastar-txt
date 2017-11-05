@@ -239,8 +239,8 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
             "RELATIVE" => {
                 if opt_relative.is_none() {
                     opt_relative = match value {
-                        "YES" => Some(true),
-                        "NO" => Some(false),
+                        "YES" | "yes" => Some(true),
+                        "NO" | "no" => Some(false),
                         _ => return Err(ParserError::ValueError{line: line_count, field: "RELATIVE"}),
                     }
                 }
