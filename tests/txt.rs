@@ -19,12 +19,12 @@ fn parse_simple_txt_lines_str() {
 
 #[test]
 fn komma_in_float_number() {
-    let txt = include_str!("komma_in_float.txt");
+    let txt = include_str!("txts/komma_in_float.txt");
     assert!(parse_txt_header_str(txt).is_ok())
 }
 
 fn get_simple_txt_str() -> &'static str {
-    include_str!("simple_txt_with_all_features.txt")
+    include_str!("txts/simple_txt_with_all_features.txt")
 }
 
 fn get_simple_txt_header() -> Header {
