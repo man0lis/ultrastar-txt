@@ -3,6 +3,7 @@ extern crate regex;
 
 use std::path::PathBuf;
 use regex::Regex;
+use std::fmt;
 
 //use std::io::{BufRead, BufReader, Read};
 
@@ -41,6 +42,20 @@ pub enum ParserError {
     UnknownNoteType{line: u32, note: String},
     ParserFailure{line: u32}
 }
+
+impl fmt::Display for ParserError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let error_msg = match *self {
+            ParserError::DuplicateHeader{ref line, ref tag} => format!("additional {} tag found in line: {}", tag, line),
+            ParserError::MissingEssential => format!("one or more essential headers are missing"),
+            ParserError::ValueError{ref line, ref field} => format!("could not parse {} in line: {}", field, line),
+            ParserError::UnknownNoteType{ref line, ref note} => format!("unknown note type '{}' in line: {}", note, line),
+            ParserError::ParserFailure{line} => format!("could not parse line: {}", line),
+        };
+        write!(f, "{}", error_msg)
+    }
+}
+
 #[derive(PartialEq, Clone, Debug)]
 pub enum NoteType {
     Regular,
