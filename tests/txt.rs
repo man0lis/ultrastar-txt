@@ -90,6 +90,12 @@ fn negative_pitch_in_lines() {
 }
 
 #[test]
+fn negative_start_in_lines() {
+    let txt = include_str!("txts/negative_start_in_lines.txt");
+    assert!(parse_txt_lines_str(txt).is_ok());
+}
+
+#[test]
 fn missing_space_in_line_break() {
     let txt = include_str!("txts/missing_space_in_line_break.txt");
     assert!(parse_txt_lines_str(txt).is_ok());
