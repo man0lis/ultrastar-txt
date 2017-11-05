@@ -34,6 +34,14 @@ pub struct Song {
 }
 
 #[derive(PartialEq, Clone, Debug)]
+pub enum ParserError {
+    DuplicateHeader{line: u32, tag: String},
+    MissingEssential,
+    ValueError{line: u32, field: String},
+    UnknownNoteType{line: u32, note: String},
+    ParserFailure{line: u32}
+}
+#[derive(PartialEq, Clone, Debug)]
 pub enum NoteType {
     Regular,
     Golden,
