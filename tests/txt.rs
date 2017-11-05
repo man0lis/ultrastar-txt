@@ -72,6 +72,12 @@ fn dash_in_lyrics() {
 }
 
 #[test]
+fn empty_note_text() {
+    let txt = include_str!("txts/empty_note_text.txt");
+    assert!(parse_txt_lines_str(txt).is_ok());
+}
+
+#[test]
 fn negative_pitch_in_lines() {
     let txt = include_str!("txts/negative_pitch_in_lines.txt");
     assert!(parse_txt_lines_str(txt).is_ok());
