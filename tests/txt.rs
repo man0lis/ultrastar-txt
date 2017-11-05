@@ -55,6 +55,17 @@ fn value_error_in_header_year() {
 }
 
 #[test]
+fn survive_nonstandard_tags() {
+    let txt = include_str!("txts/survive_nonstandard_tags.txt");
+    let mut header = get_simple_txt_header();
+    let mut unknown = HashMap::new();
+    unknown.insert(String::from("MedleyStartBeat"), String::from("550"));
+    unknown.insert(String::from("MedleyEndBeat"), String::from("863"));
+    header.unknown = Some(unknown);
+    assert_eq!(parse_txt_header_str(txt).unwrap(), header);
+}
+
+#[test]
 fn lower_case_relative() {
     let txt = include_str!("txts/lower_case_relative.txt");
     assert!(parse_txt_header_str(txt).is_ok());

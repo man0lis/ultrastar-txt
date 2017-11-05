@@ -98,7 +98,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
     let mut opt_unknown: Option<HashMap<String, String>> = None;
 
     lazy_static! {
-        static ref RE: Regex = Regex::new(r"#([A-Z3]*):(.*)").unwrap();
+        static ref RE: Regex = Regex::new(r"#([A-Z3a-z]*):(.*)").unwrap();
     }
 
     let mut line_count = 0;
