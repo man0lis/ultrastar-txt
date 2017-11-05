@@ -300,7 +300,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
 
 pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
     lazy_static! {
-        static ref LINE_RE: Regex = Regex::new("^- ([0-9]+)").unwrap();
+        static ref LINE_RE: Regex = Regex::new("^- ?([0-9]+)").unwrap();
         //TODO: figure out if some of these numbers can be negative (should not, but there might be strange txts)
         static ref NOTE_RE: Regex = Regex::new("(.) ([0-9]+) ([0-9]+) (-?[0-9]+) (.*)").unwrap();
     }
