@@ -108,6 +108,13 @@ fn missing_space_in_line_break() {
 }
 
 #[test]
+fn allow_multiple_spaces_between_line_values() {
+    let txt = include_str!("txts/allow_multiple_spaces_between_line_values.txt");
+    let lines = get_simple_txt_lines();
+    assert_eq!(lines, parse_txt_lines_str(txt).unwrap());
+}
+
+#[test]
 fn lower_case_relative() {
     let txt = include_str!("txts/lower_case_relative.txt");
     assert!(parse_txt_header_str(txt).is_ok());
