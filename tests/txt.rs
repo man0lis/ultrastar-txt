@@ -43,6 +43,7 @@ fn get_simple_txt_header() -> Header {
         edition: Some(String::from("Testmusic")),
         language: Some(String::from("en")),
         year: Some(1337),
+        unknown: None,
     }
 }
 

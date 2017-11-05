@@ -4,8 +4,7 @@ extern crate regex;
 use std::path::PathBuf;
 use regex::Regex;
 use std::fmt;
-
-//use std::io::{BufRead, BufReader, Read};
+use std::collections::HashMap;
 
 #[derive(PartialEq, Clone, Debug)]
 pub struct Header {
@@ -26,6 +25,7 @@ pub struct Header {
     pub language: Option<String>,
     pub year: Option<u32>,
     pub relative: Option<bool>,
+    pub unknown: Option<HashMap<String,String>>,
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -95,6 +95,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
     let mut opt_language = None;
     let mut opt_year = None;
     let mut opt_relative = None;
+    let mut opt_unknown: Option<HashMap<String, String>> = None;
 
     lazy_static! {
         static ref RE: Regex = Regex::new(r"#([A-Z3]*):(.*)").unwrap();
@@ -240,8 +241,23 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     return Err(ParserError::DuplicateHeader{line: line_count, tag: "RELATIVE"});
                 }
             },
-            // TODO: use hashmap to store unknown tags
-            _ => println!("Warning: unknown tag {} found in line: {}", key, line_count),
+            // use hashmap to store unknown tags
+            k => {
+                opt_unknown = match opt_unknown {
+                    Some(mut x) => if !x.contains_key(k) {
+                        x.insert(String::from(k), String::from(value));
+                        Some(x)
+                    }
+                    else {
+                        return Err(ParserError::DuplicateHeader{line: line_count, tag: "UNKNOWN"});
+                    },
+                    None => {
+                        let mut unknown = HashMap::new();
+                        unknown.insert(String::from(k), String::from(value));
+                        Some(unknown)
+                    },
+                };
+            },
         };
 
     }
@@ -264,6 +280,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
             language: opt_language,
             year: opt_year,
             relative: opt_relative,
+            unknown: opt_unknown,
         };
         // header complete
         Ok(header)
