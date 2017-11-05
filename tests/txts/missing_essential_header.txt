@@ -1,0 +1,6 @@
+#TITLE:Testsong
+#ARTIST:Testartist
+#GAP:123.0
+#BPM:123.0
+: 0 4 59 Test
+E

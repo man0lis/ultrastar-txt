@@ -1,0 +1,9 @@
+#TITLE:Testsong
+#ARTIST:Testartist
+#MP3:Testfile.mp3
+#GAP:123.0
+#BPM:123.0
+#VIDEOGAP:123.0
+#YEAR:This
+: 0 4 59 Test
+E

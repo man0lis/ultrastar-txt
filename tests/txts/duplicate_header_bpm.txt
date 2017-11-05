@@ -1,0 +1,18 @@
+#TITLE:Testsong
+#ARTIST:Testartist
+#MP3:Testfile.mp3
+#GAP:666
+#BPM:123
+#BPM:123
+#GENRE:Music
+#EDITION:Testmusic
+#COVER:Cover.jpg
+#BACKGROUND:BG.jpg
+#VIDEO:DLzxrzFCyOs.mp4
+#VIDEOGAP:777
+#RELATIVE:NO
+#LANGUAGE:en
+#YEAR:1337
+#UNKNOWN:Test
+: 0 4 59 Test
+E

@@ -2,16 +2,17 @@ extern crate ultrastar_txt;
 
 use ultrastar_txt::*;
 use std::path::PathBuf;
+use std::collections::HashMap;
 
 #[test]
-fn parse_simple_txt_header_str() {
+fn simple_txt_header() {
     let txt = get_simple_txt_str();
     let header = get_simple_txt_header();
     assert_eq!(header, parse_txt_header_str(txt).unwrap());
 }
 
 #[test]
-fn parse_simple_txt_lines_str() {
+fn simple_txt_lines() {
     let txt = get_simple_txt_str();
     let lines = get_simple_txt_lines();
     assert_eq!(lines, parse_txt_lines_str(txt).unwrap());
@@ -21,6 +22,143 @@ fn parse_simple_txt_lines_str() {
 fn komma_in_float_number() {
     let txt = include_str!("txts/komma_in_float.txt");
     assert!(parse_txt_header_str(txt).is_ok())
+}
+
+#[test]
+fn missing_essential_header() {
+    let txt = include_str!("txts/missing_essential_header.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::MissingEssential));
+}
+
+#[test]
+fn value_error_in_header_bpm() {
+    let txt = include_str!("txts/value_error_in_header_bpm.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::ValueError { line: 5, field: "BPM" }));
+}
+
+#[test]
+fn value_error_in_header_gap() {
+    let txt = include_str!("txts/value_error_in_header_gap.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::ValueError { line: 4, field: "GAP" }));
+}
+
+#[test]
+fn value_error_in_header_videogap() {
+    let txt = include_str!("txts/value_error_in_header_videogap.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::ValueError { line: 6, field: "VIDEOGAP" }));
+}
+
+#[test]
+fn value_error_in_header_year() {
+    let txt = include_str!("txts/value_error_in_header_year.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::ValueError { line: 7, field: "YEAR" }));
+}
+
+#[test]
+fn unknown_note_type() {
+    let txt = include_str!("txts/unknown_note_type.txt");
+    assert_eq!(parse_txt_lines_str(txt), Err(ParserError::UnknownNoteType { line: 7 }));
+}
+
+#[test]
+fn unknown_tags() {
+    let txt = include_str!("txts/unknown_tags.txt");
+    let mut header = get_simple_txt_header();
+    let mut unknown = HashMap::new();
+    unknown.insert(String::from("UNKNOWN"), String::from("tag"));
+    unknown.insert(String::from("WHAT"), String::from("is this"));
+    header.unknown = Some(unknown);
+    assert_eq!(parse_txt_header_str(txt).unwrap(), header);
+}
+
+#[test]
+fn garbage_line() {
+    let txt = include_str!("txts/garbage_line.txt");
+    assert_eq!(parse_txt_lines_str(txt), Err(ParserError::ParserFailure { line: 7 }));
+}
+
+#[test]
+fn duplicate_header_artist() {
+    let txt = include_str!("txts/duplicate_header_artist.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 3, tag: "ARTIST" }));
+}
+
+#[test]
+fn duplicate_header_background() {
+    let txt = include_str!("txts/duplicate_header_background.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 10, tag: "BACKGROUND" }));
+}
+
+#[test]
+fn duplicate_header_bpm() {
+    let txt = include_str!("txts/duplicate_header_bpm.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 6, tag: "BPM" }));
+}
+
+#[test]
+fn duplicate_header_cover() {
+    let txt = include_str!("txts/duplicate_header_cover.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 9, tag: "COVER" }));
+}
+
+#[test]
+fn duplicate_header_edition() {
+    let txt = include_str!("txts/duplicate_header_edition.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 8, tag: "EDITION" }));
+}
+
+#[test]
+fn duplicate_header_gap() {
+    let txt = include_str!("txts/duplicate_header_gap.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 5, tag: "GAP" }));
+}
+
+#[test]
+fn duplicate_header_genre() {
+    let txt = include_str!("txts/duplicate_header_genre.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 7, tag: "GENRE" }));
+}
+
+#[test]
+fn duplicate_header_language() {
+    let txt = include_str!("txts/duplicate_header_language.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 14, tag: "LANGUAGE" }));
+}
+
+#[test]
+fn duplicate_header_mp3() {
+    let txt = include_str!("txts/duplicate_header_mp3.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 4, tag: "MP3" }));
+}
+
+#[test]
+fn duplicate_header_relative() {
+    let txt = include_str!("txts/duplicate_header_relative.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 13, tag: "RELATIVE" }));
+}
+
+#[test]
+fn duplicate_header_title() {
+    let txt = include_str!("txts/duplicate_header_title.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 2, tag: "TITLE" }));
+}
+
+#[test]
+fn duplicate_header_unknown() {
+    let txt = include_str!("txts/duplicate_header_unknown.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 16, tag: "UNKNOWN" }));
+}
+
+#[test]
+fn duplicate_header_video() {
+    let txt = include_str!("txts/duplicate_header_video.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 11, tag: "VIDEO" }));
+}
+
+#[test]
+fn duplicate_header_videogap() {
+    let txt = include_str!("txts/duplicate_header_videogap.txt");
+    assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 12, tag: "VIDEOGAP" }));
 }
 
 fn get_simple_txt_str() -> &'static str {
