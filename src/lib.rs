@@ -36,10 +36,10 @@ pub struct Song {
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum ParserError {
-    DuplicateHeader{line: u32, tag: String},
+    DuplicateHeader{line: u32, tag: &'static str},
     MissingEssential,
-    ValueError{line: u32, field: String},
-    UnknownNoteType{line: u32, note: String},
+    ValueError{line: u32, field: &'static str},
+    UnknownNoteType{line: u32},
     ParserFailure{line: u32}
 }
 
@@ -49,7 +49,7 @@ impl fmt::Display for ParserError {
             ParserError::DuplicateHeader{ref line, ref tag} => format!("additional {} tag found in line: {}", tag, line),
             ParserError::MissingEssential => format!("one or more essential headers are missing"),
             ParserError::ValueError{ref line, ref field} => format!("could not parse {} in line: {}", field, line),
-            ParserError::UnknownNoteType{ref line, ref note} => format!("unknown note type '{}' in line: {}", note, line),
+            ParserError::UnknownNoteType{ref line} => format!("unknown note type in line: {}", line),
             ParserError::ParserFailure{line} => format!("could not parse line: {}", line),
         };
         write!(f, "{}", error_msg)
@@ -115,7 +115,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_title = Some(String::from(value));
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("TITLE")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "TITLE"});
                 }
             },
             "ARTIST" => {
@@ -123,7 +123,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_artist = Some(String::from(value));
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("ARTIST")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "ARTIST"});
                 }
             },
             "MP3" => {
@@ -131,29 +131,29 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_audio_path = Some(PathBuf::from(value));
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("MP3")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "MP3"});
                }
             },
             "GAP" => {
                 if opt_gap.is_none() {
                     opt_gap = match value.replace(",", ".").parse() {
                         Ok(x) => Some(x),
-                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("GAP")}),
+                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: "GAP"}),
                     };
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("GAP")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "GAP"});
                 }
             },
             "BPM" => {
                 if opt_bpm.is_none() {
                     opt_bpm = match value.replace(",", ".").parse() {
                         Ok(x) => Some(x),
-                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("BPM")}),
+                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: "BPM"}),
                     };
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("BPM")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "BPM"});
                 }
             },
 
@@ -163,7 +163,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_cover_path = Some(PathBuf::from(value));
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("COVER")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "COVER"});
                 }
             },
             "BACKGROUND" => {
@@ -171,7 +171,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_background_path = Some(PathBuf::from(value));
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("BACKGROUND")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "BACKGROUND"});
                 }
             },
             "VIDEO" => {
@@ -179,18 +179,18 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_video_path = Some(PathBuf::from(value));
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("VIDEO")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "VIDEO"});
                 }
             },
             "VIDEOGAP" => {
                 if opt_video_gap.is_none() {
                     opt_video_gap = match value.replace(",", ".").parse() {
                         Ok(x) => Some(x),
-                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("VIDEOGAP")}),
+                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: "VIDEOGAP"}),
                     };
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("VIDEOGAP")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "VIDEOGAP"});
                 }
             },
             "GENRE" => {
@@ -198,7 +198,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_genre = Some(String::from(value));
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("GENRE")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "GENRE"});
                 }
             },
             "EDITION" => {
@@ -206,7 +206,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_edition = Some(String::from(value));
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("EDITION")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "EDITION"});
                 }
             },
             "LANGUAGE" => {
@@ -214,18 +214,18 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_language = Some(String::from(value));
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("LANGUAGE")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "LANGUAGE"});
                 }
             },
             "YEAR" => {
                 if opt_year.is_none() {
                     opt_year = match value.parse() {
                         Ok(x) => Some(x),
-                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("YEAR")}),
+                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: "YEAR"}),
                     };
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("YEAR")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "YEAR"});
                 }
             },
             "RELATIVE" => {
@@ -233,11 +233,11 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_relative = match value {
                         "YES" => Some(true),
                         "NO" => Some(false),
-                        _ => return Err(ParserError::ValueError{line: line_count, field: String::from("RELATIVE")}),
+                        _ => return Err(ParserError::ValueError{line: line_count, field: "RELATIVE"}),
                     }
                 }
                 else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: String::from("RELATIVE")});
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "RELATIVE"});
                 }
             },
             // TODO: use hashmap to store unknown tags
@@ -278,7 +278,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
     lazy_static! {
         static ref LINE_RE: Regex = Regex::new("- ([0-9]*)").unwrap();
         //TODO: figure out if some of these numbers can be negative (should not, but there might be strange txts)
-        static ref NOTE_RE: Regex = Regex::new("([:*F]) ([0-9]*) ([0-9]*) ([0-9]*) (.*)").unwrap();
+        static ref NOTE_RE: Regex = Regex::new("(.) ([0-9]*) ([0-9]*) ([0-9]*) (.*)").unwrap();
     }
 
     let mut lines_vec = Vec::new();
@@ -314,7 +314,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             let cap = LINE_RE.captures(line).unwrap();
             let line_start = match cap.get(1).unwrap().as_str().parse() {
                 Ok(x) => x,
-                Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("line start")}),
+                Err(_) => return Err(ParserError::ValueError{line: line_count, field: "line start"}),
             };
             current_line = Line {
                 start: line_start,
@@ -330,19 +330,19 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
                 ":" => NoteType::Regular,
                 "*" => NoteType::Golden,
                 "F" => NoteType::Freestyle,
-                x => return Err(ParserError::UnknownNoteType{line: line_count, note: String::from(x)}),
+                _ => return Err(ParserError::UnknownNoteType{line: line_count}),
             };
             let note_start = match cap.get(2).unwrap().as_str().parse() {
                 Ok(x) => x,
-                Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("start")}),
+                Err(_) => return Err(ParserError::ValueError{line: line_count, field: "note start"}),
             };
             let note_duration = match cap.get(3).unwrap().as_str().parse() {
                 Ok(x) => x,
-                Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("duration")}),
+                Err(_) => return Err(ParserError::ValueError{line: line_count, field: "note duration"}),
             };
             let note_pitch = match cap.get(4).unwrap().as_str().parse() {
                 Ok(x) => x,
-                Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("pitch")}),
+                Err(_) => return Err(ParserError::ValueError{line: line_count, field: "note pitch"}),
             };
             let note_text = cap.get(5).unwrap().as_str();
 
