@@ -274,7 +274,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
     }
 }
 
-pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, String> {
+pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
     lazy_static! {
         static ref LINE_RE: Regex = Regex::new("- ([0-9]*)").unwrap();
         //TODO: figure out if some of these numbers can be negative (should not, but there might be strange txts)
@@ -293,7 +293,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, String> {
 
         let first_char = match line.chars().nth(0) {
             Some(x) => x,
-            None => return Err(format!("Could not parse line: {}", line_count)),
+            None => return Err(ParserError::ParserFailure{line: line_count}),
         };
 
         // ignore header
@@ -314,7 +314,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, String> {
             let cap = LINE_RE.captures(line).unwrap();
             let line_start = match cap.get(1).unwrap().as_str().parse() {
                 Ok(x) => x,
-                Err(_) => return Err(format!("Could not parse line start in line: {}", line_count)),
+                Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("line start")}),
             };
             current_line = Line {
                 start: line_start,
@@ -330,19 +330,19 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, String> {
                 ":" => NoteType::Regular,
                 "*" => NoteType::Golden,
                 "F" => NoteType::Freestyle,
-                _ => return Err(format!("Could not parse note type in line: {}", line_count)),
+                x => return Err(ParserError::UnknownNoteType{line: line_count, note: String::from(x)}),
             };
             let note_start = match cap.get(2).unwrap().as_str().parse() {
                 Ok(x) => x,
-                Err(_) => return Err(format!("Could not parse note start in line: {}", line_count)),
+                Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("start")}),
             };
             let note_duration = match cap.get(3).unwrap().as_str().parse() {
                 Ok(x) => x,
-                Err(_) => return Err(format!("Could not parse note duration in line: {}", line_count)),
+                Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("duration")}),
             };
             let note_pitch = match cap.get(4).unwrap().as_str().parse() {
                 Ok(x) => x,
-                Err(_) => return Err(format!("Could not parse note pitch in line: {}", line_count)),
+                Err(_) => return Err(ParserError::ValueError{line: line_count, field: String::from("pitch")}),
             };
             let note_text = cap.get(5).unwrap().as_str();
 
@@ -357,7 +357,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, String> {
         }
         // unknown line
         else {
-            return Err(format!("Could not parse line: {}", line_count));
+            return Err(ParserError::ParserFailure{line: line_count});
         }
 
     }
