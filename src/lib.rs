@@ -12,10 +12,10 @@ pub struct Header {
     pub artist: String,
     pub title: String,
     pub bpm: f32,
-    pub gap: f32,
     pub audio_path: PathBuf,
 
     // optional data from headers
+    pub gap: Option<f32>,
     pub cover_path: Option<PathBuf>,
     pub background_path: Option<PathBuf>,
     pub video_path: Option<PathBuf>,
@@ -83,9 +83,9 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
     let mut opt_title = None;
     let mut opt_artist = None;
     let mut opt_bpm = None;
-    let mut opt_gap = None;
     let mut opt_audio_path = None;
 
+    let mut opt_gap = None;
     let mut opt_cover_path = None;
     let mut opt_background_path = None;
     let mut opt_video_path = None;
@@ -142,17 +142,6 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     return Err(ParserError::DuplicateHeader{line: line_count, tag: "MP3"});
                }
             },
-            "GAP" => {
-                if opt_gap.is_none() {
-                    opt_gap = match value.replace(",", ".").parse() {
-                        Ok(x) => Some(x),
-                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: "GAP"}),
-                    };
-                }
-                else {
-                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "GAP"});
-                }
-            },
             "BPM" => {
                 if opt_bpm.is_none() {
                     opt_bpm = match value.replace(",", ".").parse() {
@@ -166,6 +155,17 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
             },
 
             // Optional Header fields
+            "GAP" => {
+                if opt_gap.is_none() {
+                    opt_gap = match value.replace(",", ".").parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => return Err(ParserError::ValueError{line: line_count, field: "GAP"}),
+                    };
+                }
+                else {
+                    return Err(ParserError::DuplicateHeader{line: line_count, tag: "GAP"});
+                }
+            },
             "COVER" => {
                 if opt_cover_path.is_none() {
                     opt_cover_path = Some(PathBuf::from(value));
@@ -236,6 +236,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     return Err(ParserError::DuplicateHeader{line: line_count, tag: "YEAR"});
                 }
             },
+            //TODO: check if relative changes line breaks
             "RELATIVE" => {
                 if opt_relative.is_none() {
                     opt_relative = match value {
@@ -270,14 +271,14 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
     }
 
     // build header from Options
-    if let (Some(title), Some(artist), Some(bpm), Some(gap), Some(auto_path)) = (opt_title, opt_artist, opt_bpm, opt_gap, opt_audio_path) {
+    if let (Some(title), Some(artist), Some(bpm), Some(auto_path)) = (opt_title, opt_artist, opt_bpm, opt_audio_path) {
         let header = Header {
             title: title,
             artist: artist,
             bpm: bpm,
-            gap: gap,
             audio_path: auto_path,
 
+            gap: opt_gap,
             cover_path: opt_cover_path,
             background_path: opt_background_path,
             video_path: opt_video_path,
