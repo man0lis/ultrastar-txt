@@ -250,6 +250,19 @@ fn missing_end_indicator() {
     assert_eq!(parse_txt_lines_str(txt), Err(ParserError::MissingEndIndicator));
 }
 
+#[test]
+fn generate_and_reparse_song() {
+    let orig_txt_header = get_simple_txt_header();
+    let orig_txt_lines= get_simple_txt_lines();
+
+    let generated_txt = generate_song_txt(&orig_txt_header, &orig_txt_lines).unwrap();
+    let parsed_header = parse_txt_header_str(generated_txt.as_ref()).unwrap();
+    let parsed_lines = parse_txt_lines_str(generated_txt.as_ref()).unwrap();
+
+    assert_eq!(parsed_header, orig_txt_header);
+    assert_eq!(parsed_lines, orig_txt_lines);
+}
+
 fn get_simple_txt_str() -> &'static str {
     include_str!("txts/simple_txt_with_all_features.txt")
 }
