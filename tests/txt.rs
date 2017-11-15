@@ -244,6 +244,12 @@ fn duplicate_header_videogap() {
     assert_eq!(parse_txt_header_str(txt), Err(ParserError::DuplicateHeader { line: 12, tag: "VIDEOGAP" }));
 }
 
+#[test]
+fn missing_end_indicator() {
+    let txt = include_str!("txts/missing_end.txt");
+    assert_eq!(parse_txt_lines_str(txt), Err(ParserError::MissingEndIndicator));
+}
+
 fn get_simple_txt_str() -> &'static str {
     include_str!("txts/simple_txt_with_all_features.txt")
 }

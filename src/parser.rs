@@ -10,17 +10,19 @@ pub enum ParserError {
     MissingEssential,
     ValueError{line: u32, field: &'static str},
     UnknownNoteType{line: u32},
-    ParserFailure{line: u32}
+    ParserFailure{line: u32},
+    MissingEndIndicator,
 }
 
 impl fmt::Display for ParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let error_msg = match *self {
             ParserError::DuplicateHeader{ref line, ref tag} => format!("additional {} tag found in line: {}", tag, line),
-            ParserError::MissingEssential => format!("one or more essential headers are missing"),
+            ParserError::MissingEssential => String::from("one or more essential headers are missing"),
             ParserError::ValueError{ref line, ref field} => format!("could not parse {} in line: {}", field, line),
             ParserError::UnknownNoteType{ref line} => format!("unknown note type in line: {}", line),
             ParserError::ParserFailure{line} => format!("could not parse line: {}", line),
+            ParserError::MissingEndIndicator => String::from("missing end indicator"),
         };
         write!(f, "{}", error_msg)
     }
@@ -262,6 +264,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
     };
 
     let mut line_count = 0;
+    let mut found_end_indicator = false;
     for line in txt_str.lines() {
         line_count += 1;
 
@@ -278,6 +281,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
         // stop parsing after end symbol
         if first_char == 'E' {
             lines_vec.push(current_line);
+            found_end_indicator = true;
             break;
         }
 
@@ -341,6 +345,11 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
         }
 
     }
-    Ok(lines_vec)
+    if found_end_indicator {
+        Ok(lines_vec)
+    }
+    else {
+        Err(ParserError::MissingEndIndicator)
+    }
 
 }
