@@ -2,6 +2,7 @@
 name = "ultrastar-txt"
 version = "0.1.0"
 authors = ["Robin Nehls <rust@manol.is>"]
+description = "A library for parsing and generating Ultrastar TXT files"
 license = "MIT"
 
 [dependencies]
