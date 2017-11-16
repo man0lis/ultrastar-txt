@@ -1,8 +1,18 @@
+use std::fmt;
 use structs::*;
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum GeneratorError {
     InvalidPath{tag: &'static str},
+}
+
+impl fmt::Display for GeneratorError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let error_msg = match *self {
+            GeneratorError::InvalidPath{ref tag} => format!("invalid path in tag {}", tag),
+        };
+        write!(f, "{}", error_msg)
+    }
 }
 
 pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, GeneratorError> {
