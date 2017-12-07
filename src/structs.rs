@@ -51,9 +51,7 @@ pub enum Note {
         pitch: i32, //pitch might not be needed but not including it might lose data from orig file
         text: String,
     },
-    PlayerChange {
-        start: i32,
-    }
+    PlayerChange { start: i32 },
 }
 
 #[derive(PartialEq, Clone, Debug)]

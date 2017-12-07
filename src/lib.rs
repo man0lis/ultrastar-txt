@@ -8,4 +8,3 @@ mod generator;
 pub use parser::*;
 pub use structs::*;
 pub use generator::*;
-
