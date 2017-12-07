@@ -20,7 +20,7 @@ pub struct Header {
     pub language: Option<String>,
     pub year: Option<u32>,
     pub relative: Option<bool>,
-    pub unknown: Option<HashMap<String,String>>,
+    pub unknown: Option<HashMap<String, String>>,
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -32,19 +32,25 @@ pub struct Song {
 
 
 #[derive(PartialEq, Clone, Debug)]
-pub enum NoteType {
-    Regular,
-    Golden,
-    Freestyle,
-}
-
-#[derive(PartialEq, Clone, Debug)]
-pub struct Note {
-    pub notetype: NoteType,
-    pub start: i32,
-    pub duration: i32,
-    pub pitch: i32,
-    pub text: String,
+pub enum Note {
+    Regular {
+        start: i32,
+        duration: i32,
+        pitch: i32,
+        text: String,
+    },
+    Golden {
+        start: i32,
+        duration: i32,
+        pitch: i32,
+        text: String,
+    },
+    Freestyle {
+        start: i32,
+        duration: i32,
+        pitch: i32, //pitch might not be needed but not including it might lose data from orig file
+        text: String,
+    }, 
 }
 
 #[derive(PartialEq, Clone, Debug)]

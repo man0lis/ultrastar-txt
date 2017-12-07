@@ -292,36 +292,31 @@ fn get_simple_txt_lines() -> Vec<Line> {
     Line {
         start: 0,
         notes: vec![
-        Note {
-            notetype: NoteType::Regular,
+        Note::Regular {
             start: 0,
             duration: 4,
             pitch: 59,
             text: String::from("Test "),
         },
-        Note {
-            notetype: NoteType::Regular,
+        Note::Regular {
             start: 4,
             duration: 4,
             pitch: 59,
             text: String::from("I"),
         },
-        Note {
-            notetype: NoteType::Regular,
+        Note::Regular {
             start: 8,
             duration: 4,
             pitch: 59,
             text: String::from("'m "),
         },
-        Note {
-            notetype: NoteType::Golden,
+        Note::Golden {
             start: 12,
             duration: 4,
             pitch: 59,
             text: String::from("test"),
         },
-        Note {
-            notetype: NoteType::Regular,
+        Note::Regular {
             start: 16,
             duration: 4,
             pitch: 59,
@@ -332,36 +327,31 @@ fn get_simple_txt_lines() -> Vec<Line> {
     Line {
         start: 20,
         notes: vec![
-        Note {
-            notetype: NoteType::Regular,
+        Note::Regular {
             start: 24,
             duration: 4,
             pitch: 59,
             text: String::from("Test "),
         },
-        Note {
-            notetype: NoteType::Regular,
+        Note::Regular {
             start: 28,
             duration: 4,
             pitch: 59,
             text: String::from("I"),
         },
-        Note {
-            notetype: NoteType::Regular,
+        Note::Regular {
             start: 32,
             duration: 4,
             pitch: 59,
             text: String::from("'m "),
         },
-        Note {
-            notetype: NoteType::Freestyle,
+        Note::Freestyle {
             start: 36,
             duration: 4,
             pitch: 59,
             text: String::from("test"),
         },
-        Note {
-            notetype: NoteType::Freestyle,
+        Note::Freestyle {
             start: 40,
             duration: 4,
             pitch: 59,

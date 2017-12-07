@@ -87,12 +87,11 @@ pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, G
             song_txt_str.push_str(format!("- {}\n", line.start).as_ref());
         }
         for note in line.notes.iter() {
-            let notetype_symbol = match note.notetype {
-                NoteType::Regular   => ":",
-                NoteType::Golden    => "*",
-                NoteType::Freestyle => "F",
+            match note {
+               &Note::Regular{start, duration, pitch, ref text} => song_txt_str.push_str(format!(": {} {} {} {}\n", start, duration, pitch, text).as_ref()),
+               &Note::Golden{start, duration, pitch, ref text} => song_txt_str.push_str(format!("* {} {} {} {}\n", start, duration, pitch, text).as_ref()),
+               &Note::Freestyle{start, duration, pitch, ref text} => song_txt_str.push_str(format!("F {} {} {} {}\n", start, duration, pitch, text).as_ref()),
             };
-            song_txt_str.push_str(format!("{} {} {} {} {}\n", notetype_symbol, note.start, note.duration, note.pitch, note.text).as_ref());
         }
     }
     song_txt_str.push_str("E");

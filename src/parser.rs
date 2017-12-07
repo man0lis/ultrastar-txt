@@ -310,12 +310,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
         // current line is a note
         if NOTE_RE.is_match(line) {
             let cap = NOTE_RE.captures(line).unwrap();
-            let note_type = match cap.get(1).unwrap().as_str() {
-                ":" => NoteType::Regular,
-                "*" => NoteType::Golden,
-                "F" => NoteType::Freestyle,
-                _ => return Err(ParserError::UnknownNoteType{line: line_count}),
-            };
+
             let note_start = match cap.get(2).unwrap().as_str().parse() {
                 Ok(x) => x,
                 Err(_) => return Err(ParserError::ValueError{line: line_count, field: "note start"}),
@@ -329,14 +324,14 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
                 Err(_) => return Err(ParserError::ValueError{line: line_count, field: "note pitch"}),
             };
             let note_text = cap.get(5).unwrap().as_str();
-
-            let note = Note {
-                notetype: note_type,
-                start: note_start,
-                duration: note_duration,
-                pitch: note_pitch,
-                text: String::from(note_text),
+            
+            let note = match cap.get(1).unwrap().as_str() {
+                ":" => Note::Regular{start: note_start, duration: note_duration, pitch: note_pitch, text: String::from(note_text)},
+                "*" => Note::Golden{start: note_start, duration: note_duration, pitch: note_pitch, text: String::from(note_text)},
+                "F" => Note::Freestyle{start: note_start, duration: note_duration, pitch: note_pitch, text: String::from(note_text)},
+                _ => return Err(ParserError::UnknownNoteType{line: line_count}),
             };
+
             current_line.notes.push(note);
         }
         // unknown line
