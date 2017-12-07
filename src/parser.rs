@@ -253,8 +253,8 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
 pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
     lazy_static! {
         static ref LINE_RE: Regex = Regex::new("^- ?(-?[0-9]+)").unwrap();
-        //TODO: figure out if some of these numbers can be negative (should not, but there might be strange txts)
         static ref NOTE_RE: Regex = Regex::new("(.) *(-?[0-9]+) *([0-9]+) *(-?[0-9]+) (.*)").unwrap();
+        static ref DUET_RE: Regex = Regex::new("^P ?(-?[0-9]+)").unwrap();
     }
 
     let mut lines_vec = Vec::new();
@@ -283,12 +283,6 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             lines_vec.push(current_line);
             found_end_indicator = true;
             break;
-        }
-
-        // ignore duett tags for now
-        // TODO: implement duett
-        if first_char == 'P' {
-            continue;
         }
 
         // current line is a line break
@@ -333,18 +327,39 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             };
 
             current_line.notes.push(note);
-        }
-        // unknown line
-        else {
-            return Err(ParserError::ParserFailure{line: line_count});
+            continue;
         }
 
+        if DUET_RE.is_match(line) {
+            let cap = DUET_RE.captures(line).unwrap();
+            let note = match cap.get(1).unwrap().as_str().parse() {
+                Ok(x) => {
+                    if x >= 1 && x <= 3 {
+                        Note::PlayerChange { start: x }
+                    } else {
+                        return Err(ParserError::ValueError {
+                            line: line_count,
+                            field: "player change",
+                        });
+                    }
+                }
+                Err(_) => {
+                    return Err(ParserError::ValueError {
+                        line: line_count,
+                        field: "player change",
+                    })
+                }
+            };
+            current_line.notes.push(note);
+            continue;
+        } else {
+            // unknown line
+            return Err(ParserError::ParserFailure { line: line_count });
+        }
     }
     if found_end_indicator {
         Ok(lines_vec)
-    }
-    else {
+    } else {
         Err(ParserError::MissingEndIndicator)
     }
-
 }

@@ -91,6 +91,7 @@ pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, G
                &Note::Regular{start, duration, pitch, ref text} => song_txt_str.push_str(format!(": {} {} {} {}\n", start, duration, pitch, text).as_ref()),
                &Note::Golden{start, duration, pitch, ref text} => song_txt_str.push_str(format!("* {} {} {} {}\n", start, duration, pitch, text).as_ref()),
                &Note::Freestyle{start, duration, pitch, ref text} => song_txt_str.push_str(format!("F {} {} {} {}\n", start, duration, pitch, text).as_ref()),
+               &Note::PlayerChange{start} => song_txt_str.push_str(format!("P{}\n", start).as_ref()),
             };
         }
     }
