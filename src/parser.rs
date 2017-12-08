@@ -435,7 +435,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             let note = match cap.get(1).unwrap().as_str().parse() {
                 Ok(x) => {
                     if x >= 1 && x <= 3 {
-                        Note::PlayerChange { start: x }
+                        Note::PlayerChange { player: x }
                     } else {
                         return Err(ParserError::ValueError {
                             line: line_count,

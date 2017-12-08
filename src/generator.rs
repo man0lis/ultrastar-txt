@@ -119,8 +119,8 @@ pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, G
                         format!("F {} {} {} {}\n", start, duration, pitch, text).as_ref(),
                     )
                 }
-                &Note::PlayerChange { start } => {
-                    song_txt_str.push_str(format!("P{}\n", start).as_ref())
+                &Note::PlayerChange { player } => {
+                    song_txt_str.push_str(format!("P{}\n", player).as_ref())
                 }
             };
         }
