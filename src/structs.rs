@@ -19,6 +19,20 @@ pub struct Header {
     pub edition: Option<String>,
     pub language: Option<String>,
     pub year: Option<u32>,
+    /* header fields todo
+    pub creator: Option<String>,  // CREATOR
+    pub start: Option<f32>,       // START
+    pub end: Option<i32>,         // END
+    pub resolution: Option<i32>,  // RESOLUTION
+    pub notes_gap: Option<i32>,   // NOTESGAP
+    pub encoding: Option<String>, // ENCODING
+    pub preview_start: Option<i32>, // PREVIEWSTART
+    pub medley_start_beat: Option<i32>, // MEDLEYSTARTBEAT
+    pub medley_end_beat: Option<i32>,   // MEDLEYENDBEAT
+    pub calc_medley: Option<Bool>,      // CALCMEDLEY
+    pub duet_singer_p1: Option<String>, // DUETSINGERP1 / P1
+    pub duet_singer_p2: Option<String>, // DUETSINGERP2 / P2:
+    */
     pub relative: Option<bool>,
     pub unknown: Option<HashMap<String, String>>,
 }
