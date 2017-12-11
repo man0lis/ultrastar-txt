@@ -316,10 +316,10 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
 
 pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
     lazy_static! {
-        static ref LINE_RE: Regex = Regex::new("^- ?(-?[0-9]+)").unwrap();
+        static ref LINE_RE: Regex = Regex::new("^-\\s?(-?[0-9]+)").unwrap();
         static ref NOTE_RE: Regex =
-                            Regex::new("^(.) *(-?[0-9]+) *([0-9]+) *(-?[0-9]+) (.*)").unwrap();
-        static ref DUET_RE: Regex = Regex::new("^P ?(-?[0-9]+)").unwrap();
+                            Regex::new("^(.)\\s*(-?[0-9]+)\\s+(-?[0-9]+)\\s+(-?[0-9]+)\\s?(.*)").unwrap();
+        static ref DUET_RE: Regex = Regex::new("^P\\s?(-?[0-9]+)").unwrap();
     }
 
     let mut lines_vec = Vec::new();
