@@ -357,26 +357,6 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             break;
         }
 
-        // current line is a line break
-        if LINE_RE.is_match(line) {
-            // push old line to the Line vector and prepare new line
-            lines_vec.push(current_line);
-            let cap = LINE_RE.captures(line).unwrap();
-            let line_start = match cap.get(1).unwrap().as_str().parse() {
-                Ok(x) => x,
-                Err(_) => {
-                    return Err(ParserError::ValueError {
-                        line: line_count,
-                        field: "line start",
-                    })
-                }
-            };
-            current_line = Line {
-                start: line_start,
-                notes: Vec::new(),
-            };
-            continue;
-        }
 
         // current line is a note
         if NOTE_RE.is_match(line) {
@@ -441,6 +421,28 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             };
 
             current_line.notes.push(note);
+            continue;
+        }
+        
+        // current line is a line break
+        if LINE_RE.is_match(line) {
+            // push old line to the Line vector and prepare new line
+            lines_vec.push(current_line);
+            let cap = LINE_RE.captures(line).unwrap();
+            let line_start = match cap.get(1).unwrap().as_str().parse() {
+                Ok(x) => x,
+                Err(_) => {
+                    return Err(ParserError::ValueError {
+                        line: line_count,
+                        field: "line start",
+                    })
+                }
+            };
+            current_line = Line {
+                start: line_start,
+                rel_start: None,
+                notes: Vec::new(),
+            };
             continue;
         }
 
