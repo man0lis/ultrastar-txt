@@ -57,5 +57,6 @@ pub enum Note {
 #[derive(PartialEq, Clone, Debug)]
 pub struct Line {
     pub start: i32,
+    pub rel: Option<i32>,
     pub notes: Vec<Note>,
 }

@@ -85,7 +85,12 @@ pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, G
     // generate lines
     for line in lines.iter() {
         if line.start != 0 {
-            song_txt_str.push_str(format!("- {}\n", line.start).as_ref());
+            if line.rel.is_some() {
+                song_txt_str.push_str(format!("- {} {}\n", line.start, line.rel.unwrap()).as_ref());
+            }
+            else {
+                song_txt_str.push_str(format!("- {}\n", line.start).as_ref());
+            }
         }
         for note in line.notes.iter() {
             match note {

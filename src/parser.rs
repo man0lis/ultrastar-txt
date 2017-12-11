@@ -318,7 +318,8 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
 
 pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
     lazy_static! {
-        static ref LINE_RE: Regex = Regex::new("^-\\s?(-?[0-9]+)").unwrap();
+        static ref LINE_RE: Regex = Regex::new("^-\\s?(-?[0-9]+)\\s*$").unwrap();
+        static ref LREL_RE: Regex = Regex::new("^-\\s?(-?[0-9]+)\\s+(-?[0-9]+)").unwrap();
         static ref NOTE_RE: Regex =
                             Regex::new("^(.)\\s*(-?[0-9]+)\\s+(-?[0-9]+)\\s+(-?[0-9]+)\\s?(.*)").unwrap();
         static ref DUET_RE: Regex = Regex::new("^P\\s?(-?[0-9]+)").unwrap();
@@ -327,6 +328,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
     let mut lines_vec = Vec::new();
     let mut current_line = Line {
         start: 0,
+        rel: None,
         notes: Vec::new(),
     };
 
@@ -423,7 +425,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             current_line.notes.push(note);
             continue;
         }
-        
+
         // current line is a line break
         if LINE_RE.is_match(line) {
             // push old line to the Line vector and prepare new line
@@ -440,7 +442,38 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             };
             current_line = Line {
                 start: line_start,
-                rel_start: None,
+                rel: None,
+                notes: Vec::new(),
+            };
+            continue;
+        }
+        
+        // current line is a relative line break
+        if LREL_RE.is_match(line) {
+            // push old line to the Line vector and prepare new line
+            lines_vec.push(current_line);
+            let cap = LREL_RE.captures(line).unwrap();
+            let line_start = match cap.get(1).unwrap().as_str().parse() {
+                Ok(x) => x,
+                Err(_) => {
+                    return Err(ParserError::ValueError {
+                        line: line_count,
+                        field: "line start",
+                    })
+                }
+            };
+            let line_rel = match cap.get(2).unwrap().as_str().parse() {
+                Ok(x) => x,
+                Err(_) => {
+                    return Err(ParserError::ValueError {
+                        line: line_count,
+                        field: "line rel",
+                    })
+                }
+            };
+            current_line = Line {
+                start: line_start,
+                rel: Some(line_rel),
                 notes: Vec::new(),
             };
             continue;

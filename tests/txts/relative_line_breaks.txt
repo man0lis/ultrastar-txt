@@ -1,0 +1,10 @@
+#TITLE:Testsong
+#ARTIST:Testartist
+#MP3:Testfile.mp3
+#GAP:666
+#BPM:123
+#RELATIVE:YES
+: 0 4 59 Test 
+- 20 24
+: 0 4 59 Test 
+E

@@ -263,6 +263,13 @@ fn generate_and_reparse_song() {
     assert_eq!(parsed_lines, orig_txt_lines);
 }
 
+#[test]
+fn relative_line_breaks() {
+    let txt = include_str!("txts/relative_line_breaks.txt");
+    let lines = parse_txt_lines_str(txt).unwrap();
+    assert_eq!(lines[1].rel.unwrap(), 24) ;
+}
+
 fn get_simple_txt_str() -> &'static str {
     include_str!("txts/simple_txt_with_all_features.txt")
 }
@@ -291,6 +298,7 @@ fn get_simple_txt_lines() -> Vec<Line> {
     vec![
     Line {
         start: 0,
+        rel: None,
         notes: vec![
         Note::Regular {
             start: 0,
@@ -326,6 +334,7 @@ fn get_simple_txt_lines() -> Vec<Line> {
     },
     Line {
         start: 20,
+        rel: None,
         notes: vec![
         Note::Regular {
             start: 24,
