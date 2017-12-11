@@ -12,6 +12,7 @@ pub enum ParserError {
     UnknownNoteType { line: u32 },
     ParserFailure { line: u32 },
     MissingEndIndicator,
+    NotImplemented { line: u32, feature: &'static str },
 }
 
 impl fmt::Display for ParserError {
@@ -32,6 +33,7 @@ impl fmt::Display for ParserError {
             }
             ParserError::ParserFailure { line } => format!("could not parse line: {}", line),
             ParserError::MissingEndIndicator => String::from("missing end indicator"),
+            ParserError::NotImplemented { line, feature } => format!("the feature {} in line {} is not implemented", feature, line),
         };
         write!(f, "{}", error_msg)
     }
@@ -343,6 +345,11 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             continue;
         }
 
+        // not implemented
+        if first_char == 'B' {
+            return Err(ParserError::NotImplemented{line: line_count, feature: "variable bpm"});
+        }
+
         // stop parsing after end symbol
         if first_char == 'E' {
             lines_vec.push(current_line);
@@ -385,7 +392,14 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
                 }
             };
             let note_duration = match cap.get(3).unwrap().as_str().parse() {
-                Ok(x) => x,
+                Ok(x) => if x >= 0 {
+                    x
+                } else {
+                    return Err(ParserError::ValueError {
+                        line: line_count,
+                        field: "note duration",
+                    });
+                },
                 Err(_) => {
                     return Err(ParserError::ValueError {
                         line: line_count,
