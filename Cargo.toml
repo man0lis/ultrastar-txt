@@ -5,6 +5,12 @@ authors = ["Robin Nehls <rust@manol.is>"]
 description = "A library for parsing and generating Ultrastar TXT files"
 license = "MIT"
 
+[features]
+default = ["file-support"]
+file-support = ["chardet", "encoding"]
+
 [dependencies]
 regex = "0.2"
 lazy_static = "0.2"
+chardet = {version = "0.2", optional = true}
+encoding = {version = "0.2", optional = true}
