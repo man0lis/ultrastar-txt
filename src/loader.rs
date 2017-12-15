@@ -4,8 +4,8 @@ extern crate encoding;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use structs::*;
-use parser::*;
+use structs::TXTSong;
+use parser::{parse_txt_header_str, parse_txt_lines_str};
 
 // TODO proper error handling
 fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String, String> {
@@ -81,7 +81,8 @@ pub fn parse_txt_song<P: AsRef<Path>>(path: P) -> Option<TXTSong> {
             // canonicalize other path
             txt_song.header.video_path = canonicalize_path(txt_song.header.video_path, base_path);
             txt_song.header.cover_path = canonicalize_path(txt_song.header.cover_path, base_path);
-            txt_song.header.background_path = canonicalize_path(txt_song.header.background_path, base_path);
+            txt_song.header.background_path =
+                canonicalize_path(txt_song.header.background_path, base_path);
         }
         Some(txt_song)
     } else {

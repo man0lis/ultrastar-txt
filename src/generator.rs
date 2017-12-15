@@ -25,10 +25,7 @@ pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, G
     };
     let mut song_txt_str = String::from(format!(
         "#TITLE:{}\n#ARTIST:{}\n#MP3:{}\n#BPM:{}\n",
-        header.title,
-        header.artist,
-        mp3_str,
-        header.bpm
+        header.title, header.artist, mp3_str, header.bpm
     ));
     if let Some(gap) = header.gap {
         song_txt_str.push_str(&format!("#GAP:{}\n", gap));
@@ -87,8 +84,7 @@ pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, G
         if line.start != 0 {
             if line.rel.is_some() {
                 song_txt_str.push_str(format!("- {} {}\n", line.start, line.rel.unwrap()).as_ref());
-            }
-            else {
+            } else {
                 song_txt_str.push_str(format!("- {}\n", line.start).as_ref());
             }
         }
@@ -99,31 +95,22 @@ pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, G
                     duration,
                     pitch,
                     ref text,
-                } => {
-                    song_txt_str.push_str(
-                        format!(": {} {} {} {}\n", start, duration, pitch, text).as_ref(),
-                    )
-                }
+                } => song_txt_str
+                    .push_str(format!(": {} {} {} {}\n", start, duration, pitch, text).as_ref()),
                 &Note::Golden {
                     start,
                     duration,
                     pitch,
                     ref text,
-                } => {
-                    song_txt_str.push_str(
-                        format!("* {} {} {} {}\n", start, duration, pitch, text).as_ref(),
-                    )
-                }
+                } => song_txt_str
+                    .push_str(format!("* {} {} {} {}\n", start, duration, pitch, text).as_ref()),
                 &Note::Freestyle {
                     start,
                     duration,
                     pitch,
                     ref text,
-                } => {
-                    song_txt_str.push_str(
-                        format!("F {} {} {} {}\n", start, duration, pitch, text).as_ref(),
-                    )
-                }
+                } => song_txt_str
+                    .push_str(format!("F {} {} {} {}\n", start, duration, pitch, text).as_ref()),
                 &Note::PlayerChange { player } => {
                     song_txt_str.push_str(format!("P{}\n", player).as_ref())
                 }

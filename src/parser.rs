@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use regex::Regex;
 use std::collections::HashMap;
 use std::fmt;
-use structs::*;
+use structs::{Header, Line, Note};
 
 #[derive(PartialEq, Clone, Debug)]
 pub enum ParserError {
@@ -33,7 +33,10 @@ impl fmt::Display for ParserError {
             }
             ParserError::ParserFailure { line } => format!("could not parse line: {}", line),
             ParserError::MissingEndIndicator => String::from("missing end indicator"),
-            ParserError::NotImplemented { line, feature } => format!("the feature {} in line {} is not implemented", feature, line),
+            ParserError::NotImplemented { line, feature } => format!(
+                "the feature {} in line {} is not implemented",
+                feature, line
+            ),
         };
         write!(f, "{}", error_msg)
     }
@@ -349,7 +352,10 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
 
         // not implemented
         if first_char == 'B' {
-            return Err(ParserError::NotImplemented{line: line_count, feature: "variable bpm"});
+            return Err(ParserError::NotImplemented {
+                line: line_count,
+                feature: "variable bpm",
+            });
         }
 
         // stop parsing after end symbol
@@ -447,7 +453,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             };
             continue;
         }
-        
+
         // current line is a relative line break
         if LREL_RE.is_match(line) {
             // push old line to the Line vector and prepare new line
