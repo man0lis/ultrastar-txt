@@ -38,10 +38,9 @@ pub struct Header {
 }
 
 #[derive(PartialEq, Clone, Debug)]
-pub struct Song {
+pub struct TXTSong {
     pub header: Header,
-    pub lines: Option<Vec<Line>>,
-    pub txt_path: PathBuf,
+    pub lines: Vec<Line>,
 }
 
 
