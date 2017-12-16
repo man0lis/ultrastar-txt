@@ -2,6 +2,7 @@ use structs::*;
 
 error_chain!{
     errors {
+        #[doc="the path encoding is invalid"]
         InvalidPathEncoding(tag: &'static str) {
             description("invalid path encoding")
             display("invalid path encoding on tag: {}", tag)
@@ -9,6 +10,12 @@ error_chain!{
     }
 }
 
+/// Converts a Song back to the Ultrastar Song format and returns it as a String
+/// 
+/// # Arguments
+/// * header - the Header struct of the song
+/// * lines - a vector of the songs lines
+/// 
 pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String> {
     // generate header
     let mp3_str = match header.audio_path.to_str() {

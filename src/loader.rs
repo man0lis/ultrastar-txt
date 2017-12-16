@@ -9,22 +9,28 @@ use parser::{parse_txt_header_str, parse_txt_lines_str};
 
 error_chain!{
     errors {
+        #[doc="input output error while handling the file"]
         IOError {
             description("io error")
         }
+        #[doc="error in encoding detection"]
         EncodingDetectionError {
             description("encoding detection error")
         }
+        #[doc="error while decoding"]
         DecodingError(msg: String) {
             description("decoding error")
             display("decoding error: {}", msg)
         }
+        #[doc="error in path canonicalization"]
         CanonicalizationError {
             description("canonicalization error")
         }
+        #[doc="error in parsing the song header"]
         HeaderParsingError {
             description("header parsing error")
         }
+        #[doc="error in parsing the songs lines"]
         LinesParsingError {
             description("lines parsing error")
         }
@@ -68,6 +74,11 @@ fn canonicalize_path<P: AsRef<Path>, B: AsRef<Path>>(
     })
 }
 
+/// Takes path to a song file and returns TXTSong struct with canonicalized paths
+/// 
+/// # Arguments
+/// * path - the path to the song file to parse
+/// 
 pub fn parse_txt_song<P: AsRef<Path>>(path: P) -> Result<TXTSong> {
     let path = path.as_ref();
     let txt = read_file_to_string(path)?;

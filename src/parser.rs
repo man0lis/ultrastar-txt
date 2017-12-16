@@ -5,28 +5,35 @@ use structs::{Header, Line, Note};
 
 error_chain!{
     errors {
+        #[doc="duplicate header tag was found"]
         DuplicateHeader(line: u32, tag: &'static str) {
             description("duplicate header")
             display("additional {} tag found in line: {}", line, tag)
         }
+        #[doc="an essential header is missing"]
         MissingEssential {
             description("essential header is missing")
         }
+        #[doc="value could not be parsed"]
         ValueError(line: u32, field: &'static str) {
             description("could not parse value")
             display("could not parse {} in line: {}", line, field)
         }
+        #[doc="an unknown note type was found"]
         UnknownNoteType(line: u32) {
             description("unknown note type")
             display("unknown note type in line: {}", line)
         }
+        #[doc="could not parse the line at all"]
         ParserFailure(line: u32) {
             description("could not parse line")
             display("could not parse line: {}", line)
         }
+        #[doc="son is missing the end terminatior"]
         MissingEndIndicator {
             description("missing end indicator")
         }
+        #[doc="songfile uses a feature that is not implemented"]
         NotImplemented(line: u32, feature: &'static str) {
             description("not implemented")
             display("the feature {} in line {} is not implemented", line, feature)
@@ -34,6 +41,11 @@ error_chain!{
     }
 }
 
+/// Parses the Header of a given Ultrastar Song and returns a Header struct
+///
+/// # Arguments
+/// * txt_str  - a &str that contains the song to parse
+///
 pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
     let mut opt_title = None;
     let mut opt_artist = None;
@@ -251,6 +263,11 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
     }
 }
 
+/// Parses the lyric lines of a given Ultarstar song and returns a vector of Line structs
+///
+/// # Arguments
+/// * txt_str  - a &str that contains the song to parse
+///
 pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>> {
     lazy_static! {
         static ref LINE_RE: Regex = Regex::new("^-\\s?(-?[0-9]+)\\s*$").unwrap();
