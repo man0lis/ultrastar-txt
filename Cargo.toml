@@ -14,3 +14,4 @@ regex = "0.2"
 lazy_static = "0.2"
 chardet = {version = "0.2", optional = true}
 encoding = {version = "0.2", optional = true}
+error-chain = "0.11"

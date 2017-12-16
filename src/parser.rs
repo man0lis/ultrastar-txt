@@ -1,48 +1,40 @@
 use std::path::PathBuf;
 use regex::Regex;
 use std::collections::HashMap;
-use std::fmt;
 use structs::{Header, Line, Note};
 
-#[derive(PartialEq, Clone, Debug)]
-pub enum ParserError {
-    DuplicateHeader { line: u32, tag: &'static str },
-    MissingEssential,
-    ValueError { line: u32, field: &'static str },
-    UnknownNoteType { line: u32 },
-    ParserFailure { line: u32 },
-    MissingEndIndicator,
-    NotImplemented { line: u32, feature: &'static str },
-}
-
-impl fmt::Display for ParserError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let error_msg = match *self {
-            ParserError::DuplicateHeader { ref line, ref tag } => {
-                format!("additional {} tag found in line: {}", tag, line)
-            }
-            ParserError::MissingEssential => {
-                String::from("one or more essential headers are missing")
-            }
-            ParserError::ValueError {
-                ref line,
-                ref field,
-            } => format!("could not parse {} in line: {}", field, line),
-            ParserError::UnknownNoteType { ref line } => {
-                format!("unknown note type in line: {}", line)
-            }
-            ParserError::ParserFailure { line } => format!("could not parse line: {}", line),
-            ParserError::MissingEndIndicator => String::from("missing end indicator"),
-            ParserError::NotImplemented { line, feature } => format!(
-                "the feature {} in line {} is not implemented",
-                feature, line
-            ),
-        };
-        write!(f, "{}", error_msg)
+error_chain!{
+    errors {
+        DuplicateHeader(line: u32, tag: &'static str) {
+            description("duplicate header")
+            display("additional {} tag found in line: {}", line, tag)
+        }
+        MissingEssential {
+            description("essential header is missing")
+        }
+        ValueError(line: u32, field: &'static str) {
+            description("could not parse value")
+            display("could not parse {} in line: {}", line, field)
+        }
+        UnknownNoteType(line: u32) {
+            description("unknown note type")
+            display("unknown note type in line: {}", line)
+        }
+        ParserFailure(line: u32) {
+            description("could not parse line")
+            display("could not parse line: {}", line)
+        }
+        MissingEndIndicator {
+            description("missing end indicator")
+        }
+        NotImplemented(line: u32, feature: &'static str) {
+            description("not implemented")
+            display("the feature {} in line {} is not implemented", line, feature)
+        }
     }
 }
 
-pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
+pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
     let mut opt_title = None;
     let mut opt_artist = None;
     let mut opt_bpm = None;
@@ -85,30 +77,21 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                 if opt_title.is_none() {
                     opt_title = Some(String::from(value));
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "TITLE",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "TITLE"));
                 }
             }
             "ARTIST" => {
                 if opt_artist.is_none() {
                     opt_artist = Some(String::from(value));
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "ARTIST",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "ARTIST"));
                 }
             }
             "MP3" => {
                 if opt_audio_path.is_none() {
                     opt_audio_path = Some(PathBuf::from(value));
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "MP3",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "MP3"));
                 }
             }
             "BPM" => {
@@ -116,17 +99,11 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_bpm = match value.replace(",", ".").parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
-                            return Err(ParserError::ValueError {
-                                line: line_count,
-                                field: "BPM",
-                            })
+                            bail!(ErrorKind::ValueError(line_count, "BPM"));
                         }
                     };
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "BPM",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "BPM"));
                 }
             }
 
@@ -136,47 +113,32 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_gap = match value.replace(",", ".").parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
-                            return Err(ParserError::ValueError {
-                                line: line_count,
-                                field: "GAP",
-                            })
+                            bail!(ErrorKind::ValueError(line_count, "GAP"));
                         }
                     };
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "GAP",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "GAP"));
                 }
             }
             "COVER" => {
                 if opt_cover_path.is_none() {
                     opt_cover_path = Some(PathBuf::from(value));
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "COVER",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "COVER"));
                 }
             }
             "BACKGROUND" => {
                 if opt_background_path.is_none() {
                     opt_background_path = Some(PathBuf::from(value));
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "BACKGROUND",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "BACKGROUND"));
                 }
             }
             "VIDEO" => {
                 if opt_video_path.is_none() {
                     opt_video_path = Some(PathBuf::from(value));
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "VIDEO",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "VIDEO"));
                 }
             }
             "VIDEOGAP" => {
@@ -184,47 +146,32 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_video_gap = match value.replace(",", ".").parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
-                            return Err(ParserError::ValueError {
-                                line: line_count,
-                                field: "VIDEOGAP",
-                            })
+                            bail!(ErrorKind::ValueError(line_count, "VIDEOGAP"));
                         }
                     };
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "VIDEOGAP",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "VIDEOGAP"));
                 }
             }
             "GENRE" => {
                 if opt_genre.is_none() {
                     opt_genre = Some(String::from(value));
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "GENRE",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "GENRE"));
                 }
             }
             "EDITION" => {
                 if opt_edition.is_none() {
                     opt_edition = Some(String::from(value));
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "EDITION",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "EDITION"));
                 }
             }
             "LANGUAGE" => {
                 if opt_language.is_none() {
                     opt_language = Some(String::from(value));
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "LANGUAGE",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "LANGUAGE"));
                 }
             }
             "YEAR" => {
@@ -232,17 +179,11 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                     opt_year = match value.parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
-                            return Err(ParserError::ValueError {
-                                line: line_count,
-                                field: "YEAR",
-                            })
+                            bail!(ErrorKind::ValueError(line_count, "YEAR"));
                         }
                     };
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "YEAR",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "YEAR"));
                 }
             }
             //TODO: check if relative changes line breaks
@@ -252,17 +193,11 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                         "YES" | "yes" => Some(true),
                         "NO" | "no" => Some(false),
                         _ => {
-                            return Err(ParserError::ValueError {
-                                line: line_count,
-                                field: "RELATIVE",
-                            })
+                            bail!(ErrorKind::ValueError(line_count, "RELATIVE"));
                         }
                     }
                 } else {
-                    return Err(ParserError::DuplicateHeader {
-                        line: line_count,
-                        tag: "RELATIVE",
-                    });
+                    bail!(ErrorKind::DuplicateHeader(line_count, "RELATIVE"));
                 }
             }
             // use hashmap to store unknown tags
@@ -273,10 +208,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
                             x.insert(String::from(k), String::from(value));
                             Some(x)
                         } else {
-                            return Err(ParserError::DuplicateHeader {
-                                line: line_count,
-                                tag: "UNKNOWN",
-                            });
+                            bail!(ErrorKind::DuplicateHeader(line_count, "UNKNOWN"));
                         }
                     }
                     None => {
@@ -315,11 +247,11 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header, ParserError> {
         Ok(header)
     } else {
         // essential field is missing
-        Err(ParserError::MissingEssential)
+        bail!(ErrorKind::MissingEssential)
     }
 }
 
-pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
+pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>> {
     lazy_static! {
         static ref LINE_RE: Regex = Regex::new("^-\\s?(-?[0-9]+)\\s*$").unwrap();
         static ref LREL_RE: Regex = Regex::new("^-\\s?(-?[0-9]+)\\s+(-?[0-9]+)").unwrap();
@@ -342,7 +274,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
 
         let first_char = match line.chars().nth(0) {
             Some(x) => x,
-            None => return Err(ParserError::ParserFailure { line: line_count }),
+            None => bail!(ErrorKind::ParserFailure(line_count)),
         };
 
         // ignore header
@@ -352,10 +284,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
 
         // not implemented
         if first_char == 'B' {
-            return Err(ParserError::NotImplemented {
-                line: line_count,
-                feature: "variable bpm",
-            });
+            bail!(ErrorKind::NotImplemented(line_count, "variable bpm"));
         }
 
         // stop parsing after end symbol
@@ -373,35 +302,23 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             let note_start = match cap.get(2).unwrap().as_str().parse() {
                 Ok(x) => x,
                 Err(_) => {
-                    return Err(ParserError::ValueError {
-                        line: line_count,
-                        field: "note start",
-                    })
+                    bail!(ErrorKind::ValueError(line_count, "note start"));
                 }
             };
             let note_duration = match cap.get(3).unwrap().as_str().parse() {
                 Ok(x) => if x >= 0 {
                     x
                 } else {
-                    return Err(ParserError::ValueError {
-                        line: line_count,
-                        field: "note duration",
-                    });
+                    bail!(ErrorKind::ValueError(line_count, "note duration"));
                 },
                 Err(_) => {
-                    return Err(ParserError::ValueError {
-                        line: line_count,
-                        field: "note duration",
-                    })
+                    bail!(ErrorKind::ValueError(line_count, "note duration"));
                 }
             };
             let note_pitch = match cap.get(4).unwrap().as_str().parse() {
                 Ok(x) => x,
                 Err(_) => {
-                    return Err(ParserError::ValueError {
-                        line: line_count,
-                        field: "note pitch",
-                    })
+                    bail!(ErrorKind::ValueError(line_count, "note pitch"));
                 }
             };
             let note_text = cap.get(5).unwrap().as_str();
@@ -425,7 +342,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
                     pitch: note_pitch,
                     text: String::from(note_text),
                 },
-                _ => return Err(ParserError::UnknownNoteType { line: line_count }),
+                _ => bail!(ErrorKind::UnknownNoteType(line_count)),
             };
 
             current_line.notes.push(note);
@@ -440,10 +357,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             let line_start = match cap.get(1).unwrap().as_str().parse() {
                 Ok(x) => x,
                 Err(_) => {
-                    return Err(ParserError::ValueError {
-                        line: line_count,
-                        field: "line start",
-                    })
+                    bail!(ErrorKind::ValueError(line_count, "line start"));
                 }
             };
             current_line = Line {
@@ -462,19 +376,13 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
             let line_start = match cap.get(1).unwrap().as_str().parse() {
                 Ok(x) => x,
                 Err(_) => {
-                    return Err(ParserError::ValueError {
-                        line: line_count,
-                        field: "line start",
-                    })
+                    bail!(ErrorKind::ValueError(line_count, "line start"));
                 }
             };
             let line_rel = match cap.get(2).unwrap().as_str().parse() {
                 Ok(x) => x,
                 Err(_) => {
-                    return Err(ParserError::ValueError {
-                        line: line_count,
-                        field: "line rel",
-                    })
+                    bail!(ErrorKind::ValueError(line_count, "line rel"));
                 }
             };
             current_line = Line {
@@ -492,29 +400,23 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>, ParserError> {
                     if x >= 1 && x <= 3 {
                         Note::PlayerChange { player: x }
                     } else {
-                        return Err(ParserError::ValueError {
-                            line: line_count,
-                            field: "player change",
-                        });
+                        bail!(ErrorKind::ValueError(line_count, "player change"));
                     }
                 }
                 Err(_) => {
-                    return Err(ParserError::ValueError {
-                        line: line_count,
-                        field: "player change",
-                    })
+                    bail!(ErrorKind::ValueError(line_count, "player change"));
                 }
             };
             current_line.notes.push(note);
             continue;
         } else {
             // unknown line
-            return Err(ParserError::ParserFailure { line: line_count });
+            bail!(ErrorKind::ParserFailure(line_count));
         }
     }
     if found_end_indicator {
         Ok(lines_vec)
     } else {
-        Err(ParserError::MissingEndIndicator)
+        bail!(ErrorKind::MissingEndIndicator);
     }
 }

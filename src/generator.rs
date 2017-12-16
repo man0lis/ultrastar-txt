@@ -1,27 +1,19 @@
-use std::fmt;
 use structs::*;
 
-#[derive(PartialEq, Clone, Debug)]
-pub enum GeneratorError {
-    InvalidPathEncoding { tag: &'static str },
-}
-
-impl fmt::Display for GeneratorError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let error_msg = match *self {
-            GeneratorError::InvalidPathEncoding { ref tag } => {
-                format!("invalid path encoding in tag {}", tag)
-            }
-        };
-        write!(f, "{}", error_msg)
+error_chain!{
+    errors {
+        InvalidPathEncoding(tag: &'static str) {
+            description("invalid path encoding")
+            display("invalid path encoding on tag: {}", tag)
+        }
     }
 }
 
-pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, GeneratorError> {
+pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String> {
     // generate header
     let mp3_str = match header.audio_path.to_str() {
         Some(x) => x,
-        None => return Err(GeneratorError::InvalidPathEncoding { tag: "MP3" }),
+        None => bail!(ErrorKind::InvalidPathEncoding("MP3")),
     };
     let mut song_txt_str = String::from(format!(
         "#TITLE:{}\n#ARTIST:{}\n#MP3:{}\n#BPM:{}\n",
@@ -33,21 +25,21 @@ pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String, G
     if let Some(cover_path) = header.cover_path.clone() {
         let cover_str = match cover_path.to_str() {
             Some(x) => x,
-            None => return Err(GeneratorError::InvalidPathEncoding { tag: "COVER" }),
+            None => bail!(ErrorKind::InvalidPathEncoding("COVER")),
         };
         song_txt_str.push_str(&format!("#COVER:{}\n", cover_str));
     }
     if let Some(background_path) = header.background_path.clone() {
         let background_str = match background_path.to_str() {
             Some(x) => x,
-            None => return Err(GeneratorError::InvalidPathEncoding { tag: "BACKGROUND" }),
+            None => bail!(ErrorKind::InvalidPathEncoding("BACKGROUND")),
         };
         song_txt_str.push_str(&format!("#BACKGROUND:{}\n", background_str));
     }
     if let Some(video_path) = header.video_path.clone() {
         let video_str = match video_path.to_str() {
             Some(x) => x,
-            None => return Err(GeneratorError::InvalidPathEncoding { tag: "VIDEO" }),
+            None => bail!(ErrorKind::InvalidPathEncoding("VIDEO")),
         };
         song_txt_str.push_str(&format!("#VIDEO:{}\n", video_str));
     }
