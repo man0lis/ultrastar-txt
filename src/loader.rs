@@ -7,20 +7,35 @@ use std::path::{Path, PathBuf};
 use structs::TXTSong;
 use parser::{parse_txt_header_str, parse_txt_lines_str};
 
-// TODO proper error handling
-fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String, String> {
-    let p = p.as_ref();
-    let mut f = match File::open(p) {
-        Ok(x) => x,
-        Err(e) => {
-            let error = format!("error while opening file: {:?} ({:?})", e, p);
-            return Err(error);
+error_chain!{
+    errors {
+        IOError {
+            description("io error")
         }
-    };
-    let mut reader: Vec<u8> = Vec::new();
-    if let Err(_) = f.read_to_end(&mut reader) {
-        return Err(format!("ER: {:?}", f));
+        EncodingDetectionError {
+            description("encoding detection error")
+        }
+        DecodingError(msg: String) {
+            description("decoding error")
+            display("decoding error: {}", msg)
+        }
+        CanonicalizationError {
+            description("canonicalization error")
+        }
+        HeaderParsingError {
+            description("header parsing error")
+        }
+        LinesParsingError {
+            description("lines parsing error")
+        }
     }
+}
+
+fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
+    let p = p.as_ref();
+    let mut f = File::open(p).chain_err(|| ErrorKind::IOError)?;
+    let mut reader: Vec<u8> = Vec::new();
+    f.read_to_end(&mut reader).chain_err(|| ErrorKind::IOError)?;
 
     // detect encoding and decode to String
     let chardet_result = chardet::detect(&reader);
@@ -29,11 +44,9 @@ fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String, String> {
     let file_content = match coder {
         Some(c) => match c.decode(&reader, encoding::DecoderTrap::Ignore) {
             Ok(x) => x,
-            Err(e) => {
-                return Err(format!("EE: {:?} {:?}", e, p));
-            }
+            Err(e) => bail!(ErrorKind::DecodingError(e.into_owned())),
         },
-        None => return Err(format!("ED: {:?}", p)),
+        None => bail!(ErrorKind::EncodingDetectionError),
     };
 
     Ok(file_content)
@@ -42,50 +55,40 @@ fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String, String> {
 fn canonicalize_path<P: AsRef<Path>, B: AsRef<Path>>(
     path: Option<P>,
     base_path: B,
-) -> Option<PathBuf> {
-    if let Some(ref path) = path {
+) -> Result<Option<PathBuf>> {
+    Ok(if let Some(ref path) = path {
         let mut tmp_path = PathBuf::from(base_path.as_ref());
         tmp_path.push(path);
-        match tmp_path.canonicalize() {
-            Ok(x) => Some(x),
-            Err(_) => None,
-        }
+        let result = tmp_path
+            .canonicalize()
+            .chain_err(|| ErrorKind::CanonicalizationError)?;
+        Some(result)
     } else {
         None
-    }
+    })
 }
 
-// TODO: return result with error
-pub fn parse_txt_song<P: AsRef<Path>>(path: P) -> Option<TXTSong> {
+pub fn parse_txt_song<P: AsRef<Path>>(path: P) -> Result<TXTSong> {
     let path = path.as_ref();
-    if let Ok(txt) = read_file_to_string(path) {
-        let mut txt_song = TXTSong {
-            header: match parse_txt_header_str(txt.as_ref()) {
-                Ok(x) => x,
-                Err(_) => return None,
-            },
-            lines: match parse_txt_lines_str(txt.as_ref()) {
-                Ok(x) => x,
-                Err(_) => return None,
-            },
-        };
-        // canonicalize paths
-        if let Some(base_path) = path.parent() {
-            // canonicalize audio path
-            txt_song.header.audio_path =
-                match canonicalize_path(Some(txt_song.header.audio_path), base_path) {
-                    Some(x) => x,
-                    None => return None,
-                };
+    let txt = read_file_to_string(path)?;
 
-            // canonicalize other path
-            txt_song.header.video_path = canonicalize_path(txt_song.header.video_path, base_path);
-            txt_song.header.cover_path = canonicalize_path(txt_song.header.cover_path, base_path);
-            txt_song.header.background_path =
-                canonicalize_path(txt_song.header.background_path, base_path);
-        }
-        Some(txt_song)
-    } else {
-        None
+    let mut txt_song = TXTSong {
+        header: parse_txt_header_str(txt.as_ref()).chain_err(|| ErrorKind::HeaderParsingError)?,
+        lines: parse_txt_lines_str(txt.as_ref()).chain_err(|| ErrorKind::LinesParsingError)?,
+    };
+
+    // canonicalize paths
+    if let Some(base_path) = path.parent() {
+        // canonicalize audio path
+        txt_song.header.audio_path =
+            canonicalize_path(Some(txt_song.header.audio_path), base_path)?.unwrap();
+
+        // canonicalize other path
+        txt_song.header.video_path = canonicalize_path(txt_song.header.video_path, base_path)?;
+        txt_song.header.cover_path = canonicalize_path(txt_song.header.cover_path, base_path)?;
+        txt_song.header.background_path =
+            canonicalize_path(txt_song.header.background_path, base_path)?;
     }
+
+    Ok(txt_song)
 }
