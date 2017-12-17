@@ -13,7 +13,7 @@ error_chain!{
         #[doc="an essential header is missing"]
         MissingEssential {
             description("essential header is missing")
-        }
+        
         #[doc="value could not be parsed"]
         ValueError(line: u32, field: &'static str) {
             description("could not parse value")
@@ -29,11 +29,11 @@ error_chain!{
             description("could not parse line")
             display("could not parse line: {}", line)
         }
-        #[doc="son is missing the end terminatior"]
+        #[doc="song is missing the end terminator"]
         MissingEndIndicator {
             description("missing end indicator")
         }
-        #[doc="songfile uses a feature that is not implemented"]
+        #[doc="song file uses a feature that is not implemented"]
         NotImplemented(line: u32, feature: &'static str) {
             description("not implemented")
             display("the feature {} in line {} is not implemented", line, feature)

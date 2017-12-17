@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::collections::HashMap;
 
-/// Discribes the Header of an Ultrastar Song 
+/// Describes the Header of an Ultrastar Song 
 #[derive(PartialEq, Clone, Debug)]
 pub struct Header {
     // mandatory data from headers
@@ -9,7 +9,7 @@ pub struct Header {
     pub artist: String,
     /// the title of the song
     pub title: String,
-    /// the beats per minuite of the song
+    /// the beats per minute of the song
     pub bpm: f32,
     /// the path to the music file
     pub audio_path: PathBuf,
@@ -56,7 +56,7 @@ pub struct Header {
     pub unknown: Option<HashMap<String, String>>,
 }
 
-/// Discribes an Ultrastar song as the combination of its Header and its Lines
+/// Describes an Ultrastar song as the combination of its Header and its Lines
 #[derive(PartialEq, Clone, Debug)]
 pub struct TXTSong {
     /// the header of the song
@@ -65,7 +65,7 @@ pub struct TXTSong {
     pub lines: Vec<Line>,
 }
 
-/// Discribes the different types of notes the parser might encounter
+/// Describes the different types of notes the parser might encounter
 #[derive(PartialEq, Clone, Debug)]
 pub enum Note {
     /// a regular note
@@ -74,7 +74,7 @@ pub enum Note {
         start: i32,
         /// duration of the note
         duration: i32,
-        /// pitch of the note (in semitones with C2 beeing 0)
+        /// pitch of the note (in semitones with C2 being 0)
         pitch: i32,
         /// text or syllable of the note
         text: String,
@@ -85,7 +85,7 @@ pub enum Note {
         start: i32,
         /// duration of the note
         duration: i32,
-        /// pitch of the note (in semitones with C2 beeing 0)
+        /// pitch of the note (in semitones with C2 being 0)
         pitch: i32,
         /// text or syllable of the note
         text: String,
@@ -96,12 +96,12 @@ pub enum Note {
         start: i32,
         /// duration of the note
         duration: i32,
-        /// pitch of the note (in semitones with C2 beeing 0)
+        /// pitch of the note (in semitones with C2 being 0)
         pitch: i32, //pitch might not be needed but not including it might lose data from orig file
         /// text or syllable of the note
         text: String,
     },
-    /// player change indicator for duett mode
+    /// player change indicator for duet mode
     PlayerChange {
         /// player to change to
         /// 1 = Player1
@@ -111,7 +111,7 @@ pub enum Note {
     },
 }
 
-/// Discribes a line or sentence that is made up of notes thier syllables
+/// Describes a line or sentence that is made up of notes their syllables
 #[derive(PartialEq, Clone, Debug)]
 pub struct Line {
     /// the start of the line in beats
