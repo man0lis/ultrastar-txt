@@ -1,10 +1,10 @@
 [package]
 name = "ultrastar-txt"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Robin Nehls <rust@manol.is>"]
 description = "A library for parsing and generating Ultrastar TXT files"
 license = "MIT"
-documentation = "https://docs.rs/ultrastar_txt"
+documentation = "https://docs.rs/ultrastar-txt"
 repository = "https://github.com/man0lis/ultrastar-txt"
 readme = "README.md"
 keywords = ["ultrastar", "parser", "karaoke"]
