@@ -13,7 +13,8 @@ error_chain!{
         #[doc="an essential header is missing"]
         MissingEssential {
             description("essential header is missing")
-        
+        }
+
         #[doc="value could not be parsed"]
         ValueError(line: u32, field: &'static str) {
             description("could not parse value")
