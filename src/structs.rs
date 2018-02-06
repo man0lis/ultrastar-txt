@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::collections::HashMap;
 
-/// Describes the Header of an Ultrastar Song 
+/// Describes the Header of an Ultrastar Song
 #[derive(PartialEq, Clone, Debug)]
 pub struct Header {
     // mandatory data from headers
@@ -109,6 +109,58 @@ pub enum Note {
         /// 3 = Both
         player: i32,
     },
+}
+
+impl Note {
+    /// returns the start value of the note
+    pub fn start(&self) -> Option<i32> {
+        match *self {
+            Note::Regular { start, .. }
+            | Note::Golden { start, .. }
+            | Note::Freestyle { start, .. } => Some(start),
+            Note::PlayerChange { .. } => None,
+        }
+    }
+
+    /// returns the duration value of the note
+    pub fn duration(&self) -> Option<i32> {
+        match *self {
+            Note::Regular { duration, .. }
+            | Note::Golden { duration, .. }
+            | Note::Freestyle { duration, .. } => Some(duration),
+            Note::PlayerChange { .. } => None,
+        }
+    }
+
+    /// returns the pitch value of the note
+    pub fn pitch(&self) -> Option<i32> {
+        match *self {
+            Note::Regular { pitch, .. }
+            | Note::Golden { pitch, .. }
+            | Note::Freestyle { pitch, .. } => Some(pitch),
+            Note::PlayerChange { .. } => None,
+        }
+    }
+
+    /// returns a refernece to the text of the note
+    pub fn text(&self) -> Option<&str> {
+        match self {
+            &Note::Regular { ref text, .. }
+            | &Note::Golden { ref text, .. }
+            | &Note::Freestyle { ref text, .. } => Some(text),
+            &Note::PlayerChange { .. } => None,
+        }
+    }
+
+    /// returns player change number for duett mode
+    pub fn player(&self) -> Option<i32> {
+        match self {
+            &Note::PlayerChange { player, .. } => Some(player),
+            &Note::Regular { .. }
+            | &Note::Golden { .. }
+            | &Note::Freestyle { .. } => None,
+        }
+    }
 }
 
 /// Describes a line or sentence that is made up of notes their syllables
