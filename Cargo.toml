@@ -21,3 +21,22 @@ lazy_static = "1"
 chardet = {version = "0.2", optional = true}
 encoding = {version = "0.2", optional = true}
 error-chain = "0.12"
+
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "generate_real_song"
+harness = false
+
+[[bench]]
+name = "generate_simple_song"
+harness = false
+
+[[bench]]
+name = "parse_real_song"
+harness = false
+
+[[bench]]
+name = "parse_simple_song"
+harness = false
