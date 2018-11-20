@@ -1,5 +1,5 @@
-use std::path::PathBuf;
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 /// Describes the Header of an Ultrastar Song
 #[derive(PartialEq, Clone, Debug)]
@@ -156,9 +156,7 @@ impl Note {
     pub fn player(&self) -> Option<i32> {
         match self {
             &Note::PlayerChange { player, .. } => Some(player),
-            &Note::Regular { .. }
-            | &Note::Golden { .. }
-            | &Note::Freestyle { .. } => None,
+            &Note::Regular { .. } | &Note::Golden { .. } | &Note::Freestyle { .. } => None,
         }
     }
 }

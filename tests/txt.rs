@@ -1,16 +1,18 @@
 extern crate ultrastar_txt;
 
-use ultrastar_txt::*;
-use std::path::PathBuf;
 use std::collections::HashMap;
+use std::path::PathBuf;
+use ultrastar_txt::*;
 
 // usage:
 //    assert_error_kind!(some_err, ErrorKind::MyErrorType)
 macro_rules! assert_error_kind {
-    ($err:expr, $kind:pat) => (match *$err.kind() {
-        $kind => assert!(true, "{:?} is of kind {:?}", $err, stringify!($kind)),
-        _     => assert!(false, "{:?} is NOT of kind {:?}", $err, stringify!($kind))
-    });
+    ($err:expr, $kind:pat) => {
+        match *$err.kind() {
+            $kind => assert!(true, "{:?} is of kind {:?}", $err, stringify!($kind)),
+            _ => assert!(false, "{:?} is NOT of kind {:?}", $err, stringify!($kind)),
+        }
+    };
 }
 
 #[test]
@@ -36,133 +38,199 @@ fn komma_in_float_number() {
 #[test]
 fn missing_essential_header() {
     let txt = include_str!("txts/missing_essential_header.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::MissingEssential);
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::MissingEssential
+    );
 }
 
 #[test]
 fn value_error_in_header_bpm() {
     let txt = include_str!("txts/value_error_in_header_bpm.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::ValueError(5, "BPM"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ValueError(5, "BPM")
+    );
 }
 
 #[test]
 fn value_error_in_header_gap() {
     let txt = include_str!("txts/value_error_in_header_gap.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::ValueError(4, "GAP"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ValueError(4, "GAP")
+    );
 }
 
 #[test]
 fn value_error_in_header_videogap() {
     let txt = include_str!("txts/value_error_in_header_videogap.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::ValueError(6, "VIDEOGAP"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ValueError(6, "VIDEOGAP")
+    );
 }
 
 #[test]
 fn value_error_in_header_year() {
     let txt = include_str!("txts/value_error_in_header_year.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::ValueError(7, "YEAR"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ValueError(7, "YEAR")
+    );
 }
 
 #[test]
 fn unknown_note_type() {
     let txt = include_str!("txts/unknown_note_type.txt");
-    assert_error_kind!(parse_txt_lines_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::UnknownNoteType(7));
+    assert_error_kind!(
+        parse_txt_lines_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::UnknownNoteType(7)
+    );
 }
 
 #[test]
 fn garbage_line() {
     let txt = include_str!("txts/garbage_line.txt");
-    assert_error_kind!(parse_txt_lines_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::ParserFailure(7));
+    assert_error_kind!(
+        parse_txt_lines_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ParserFailure(7)
+    );
 }
 
 #[test]
 fn duplicate_header_artist() {
     let txt = include_str!("txts/duplicate_header_artist.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(3, "ARTIST"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(3, "ARTIST")
+    );
 }
 
 #[test]
 fn duplicate_header_background() {
     let txt = include_str!("txts/duplicate_header_background.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(10, "BACKGROUND"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(10, "BACKGROUND")
+    );
 }
 
 #[test]
 fn duplicate_header_bpm() {
     let txt = include_str!("txts/duplicate_header_bpm.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(6, "BPM"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(6, "BPM")
+    );
 }
 
 #[test]
 fn duplicate_header_cover() {
     let txt = include_str!("txts/duplicate_header_cover.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(9, "COVER"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(9, "COVER")
+    );
 }
 
 #[test]
 fn duplicate_header_edition() {
     let txt = include_str!("txts/duplicate_header_edition.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(8, "EDITION"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(8, "EDITION")
+    );
 }
 
 #[test]
 fn duplicate_header_gap() {
     let txt = include_str!("txts/duplicate_header_gap.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(5, "GAP"));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(5, "GAP")
+    );
 }
 
 #[test]
 fn duplicate_header_genre() {
     let txt = include_str!("txts/duplicate_header_genre.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(7, "GENRE" ));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(7, "GENRE")
+    );
 }
 
 #[test]
 fn duplicate_header_language() {
     let txt = include_str!("txts/duplicate_header_language.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(14, "LANGUAGE" ));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(14, "LANGUAGE")
+    );
 }
 
 #[test]
 fn duplicate_header_mp3() {
     let txt = include_str!("txts/duplicate_header_mp3.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(4, "MP3" ));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(4, "MP3")
+    );
 }
 
 #[test]
 fn duplicate_header_relative() {
     let txt = include_str!("txts/duplicate_header_relative.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(13, "RELATIVE" ));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(13, "RELATIVE")
+    );
 }
 
 #[test]
 fn duplicate_header_title() {
     let txt = include_str!("txts/duplicate_header_title.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(2, "TITLE" ));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(2, "TITLE")
+    );
 }
 
 #[test]
 fn duplicate_header_unknown() {
     let txt = include_str!("txts/duplicate_header_unknown.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(16, "UNKNOWN" ));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(16, "UNKNOWN")
+    );
 }
 
 #[test]
 fn duplicate_header_video() {
     let txt = include_str!("txts/duplicate_header_video.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(11, "VIDEO" ));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(11, "VIDEO")
+    );
 }
 
 #[test]
 fn duplicate_header_videogap() {
     let txt = include_str!("txts/duplicate_header_videogap.txt");
-    assert_error_kind!(parse_txt_header_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::DuplicateHeader(12, "VIDEOGAP" ));
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(12, "VIDEOGAP")
+    );
 }
 
 #[test]
 fn missing_end_indicator() {
     let txt = include_str!("txts/missing_end.txt");
-    assert_error_kind!(parse_txt_lines_str(txt).err().unwrap(), ultrastar_txt::parser::ErrorKind::MissingEndIndicator);
+    assert_error_kind!(
+        parse_txt_lines_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::MissingEndIndicator
+    );
 }
 
 #[test]
@@ -261,7 +329,7 @@ fn empty_optional_tags() {
 #[test]
 fn generate_and_reparse_song() {
     let orig_txt_header = get_simple_txt_header();
-    let orig_txt_lines= get_simple_txt_lines();
+    let orig_txt_lines = get_simple_txt_lines();
 
     let generated_txt = generate_song_txt(&orig_txt_header, &orig_txt_lines).unwrap();
     let parsed_header = parse_txt_header_str(generated_txt.as_ref()).unwrap();
@@ -275,7 +343,7 @@ fn generate_and_reparse_song() {
 fn relative_line_breaks() {
     let txt = include_str!("txts/relative_line_breaks.txt");
     let lines = parse_txt_lines_str(txt).unwrap();
-    assert_eq!(lines[1].rel.unwrap(), 24) ;
+    assert_eq!(lines[1].rel.unwrap(), 24);
 }
 
 fn get_simple_txt_str() -> &'static str {
@@ -304,77 +372,77 @@ fn get_simple_txt_header() -> Header {
 
 fn get_simple_txt_lines() -> Vec<Line> {
     vec![
-    Line {
-        start: 0,
-        rel: None,
-        notes: vec![
-        Note::Regular {
+        Line {
             start: 0,
-            duration: 4,
-            pitch: 59,
-            text: String::from("Test "),
+            rel: None,
+            notes: vec![
+                Note::Regular {
+                    start: 0,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("Test "),
+                },
+                Note::Regular {
+                    start: 4,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("I"),
+                },
+                Note::Regular {
+                    start: 8,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("'m "),
+                },
+                Note::Golden {
+                    start: 12,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("test"),
+                },
+                Note::Regular {
+                    start: 16,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("ing."),
+                },
+            ],
         },
-        Note::Regular {
-            start: 4,
-            duration: 4,
-            pitch: 59,
-            text: String::from("I"),
+        Line {
+            start: 20,
+            rel: None,
+            notes: vec![
+                Note::Regular {
+                    start: 24,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("Test "),
+                },
+                Note::Regular {
+                    start: 28,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("I"),
+                },
+                Note::Regular {
+                    start: 32,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("'m "),
+                },
+                Note::Freestyle {
+                    start: 36,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("test"),
+                },
+                Note::Freestyle {
+                    start: 40,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("ing."),
+                },
+            ],
         },
-        Note::Regular {
-            start: 8,
-            duration: 4,
-            pitch: 59,
-            text: String::from("'m "),
-        },
-        Note::Golden {
-            start: 12,
-            duration: 4,
-            pitch: 59,
-            text: String::from("test"),
-        },
-        Note::Regular {
-            start: 16,
-            duration: 4,
-            pitch: 59,
-            text: String::from("ing."),
-        },
-        ],
-    },
-    Line {
-        start: 20,
-        rel: None,
-        notes: vec![
-        Note::Regular {
-            start: 24,
-            duration: 4,
-            pitch: 59,
-            text: String::from("Test "),
-        },
-        Note::Regular {
-            start: 28,
-            duration: 4,
-            pitch: 59,
-            text: String::from("I"),
-        },
-        Note::Regular {
-            start: 32,
-            duration: 4,
-            pitch: 59,
-            text: String::from("'m "),
-        },
-        Note::Freestyle {
-            start: 36,
-            duration: 4,
-            pitch: 59,
-            text: String::from("test"),
-        },
-        Note::Freestyle {
-            start: 40,
-            duration: 4,
-            pitch: 59,
-            text: String::from("ing."),
-        },
-        ],
-    },
     ]
 }

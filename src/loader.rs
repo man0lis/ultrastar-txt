@@ -1,11 +1,11 @@
 extern crate chardet;
 extern crate encoding;
 
+use parser::{parse_txt_header_str, parse_txt_lines_str};
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use structs::TXTSong;
-use parser::{parse_txt_header_str, parse_txt_lines_str};
 
 error_chain!{
     errors {
@@ -41,7 +41,8 @@ fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
     let p = p.as_ref();
     let mut f = File::open(p).chain_err(|| ErrorKind::IOError)?;
     let mut reader: Vec<u8> = Vec::new();
-    f.read_to_end(&mut reader).chain_err(|| ErrorKind::IOError)?;
+    f.read_to_end(&mut reader)
+        .chain_err(|| ErrorKind::IOError)?;
 
     // detect encoding and decode to String
     let chardet_result = chardet::detect(&reader);
@@ -75,10 +76,10 @@ fn canonicalize_path<P: AsRef<Path>, B: AsRef<Path>>(
 }
 
 /// Takes path to a song file and returns TXTSong struct with canonicalized paths
-/// 
+///
 /// # Arguments
 /// * path - the path to the song file to parse
-/// 
+///
 pub fn parse_txt_song<P: AsRef<Path>>(path: P) -> Result<TXTSong> {
     let path = path.as_ref();
     let txt = read_file_to_string(path)?;

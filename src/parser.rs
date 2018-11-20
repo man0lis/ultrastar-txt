@@ -1,6 +1,6 @@
-use std::path::PathBuf;
 use regex::Regex;
 use std::collections::HashMap;
+use std::path::PathBuf;
 use structs::{Header, Line, Note};
 
 error_chain!{
@@ -78,7 +78,6 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
         };
         let key = cap.get(1).unwrap().as_str();
         let value = cap.get(2).unwrap().as_str();
-
 
         if value == "" {
             //TODO: somehow warn about this
@@ -274,7 +273,7 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>> {
         static ref LINE_RE: Regex = Regex::new("^-\\s?(-?[0-9]+)\\s*$").unwrap();
         static ref LREL_RE: Regex = Regex::new("^-\\s?(-?[0-9]+)\\s+(-?[0-9]+)").unwrap();
         static ref NOTE_RE: Regex =
-                            Regex::new("^(.)\\s*(-?[0-9]+)\\s+(-?[0-9]+)\\s+(-?[0-9]+)\\s?(.*)").unwrap();
+            Regex::new("^(.)\\s*(-?[0-9]+)\\s+(-?[0-9]+)\\s+(-?[0-9]+)\\s?(.*)").unwrap();
         static ref DUET_RE: Regex = Regex::new("^P\\s?(-?[0-9]+)").unwrap();
     }
 
@@ -311,7 +310,6 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>> {
             found_end_indicator = true;
             break;
         }
-
 
         // current line is a note
         if NOTE_RE.is_match(line) {

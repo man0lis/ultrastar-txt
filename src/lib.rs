@@ -8,20 +8,20 @@ extern crate error_chain;
 extern crate lazy_static;
 extern crate regex;
 
+/// this module contains the generator
+pub mod generator;
 /// this module contains the parser
 pub mod parser;
 /// this module contains the structs that represent the parsed data
 pub mod structs;
-/// this module contains the generator
-pub mod generator;
 
 #[cfg(feature = "file-support")]
 /// this module contains functions to parse songs from a path
 pub mod loader;
 
+pub use generator::*;
 pub use parser::*;
 pub use structs::*;
-pub use generator::*;
 
 #[cfg(feature = "file-support")]
 pub use loader::*;

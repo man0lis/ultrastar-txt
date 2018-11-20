@@ -11,11 +11,11 @@ error_chain!{
 }
 
 /// Converts a Song back to the Ultrastar Song format and returns it as a String
-/// 
+///
 /// # Arguments
 /// * header - the Header struct of the song
 /// * lines - a vector of the songs lines
-/// 
+///
 pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String> {
     // generate header
     let mp3_str = match header.audio_path.to_str() {
