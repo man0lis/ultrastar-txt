@@ -19,9 +19,9 @@ pub mod structs;
 /// this module contains functions to parse songs from a path
 pub mod loader;
 
-pub use generator::*;
-pub use parser::*;
-pub use structs::*;
+pub use crate::generator::*;
+pub use crate::parser::*;
+pub use crate::structs::*;
 
 #[cfg(feature = "file-support")]
-pub use loader::*;
+pub use crate::loader::*;

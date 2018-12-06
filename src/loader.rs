@@ -1,11 +1,11 @@
 extern crate chardet;
 extern crate encoding;
 
-use parser::{parse_txt_header_str, parse_txt_lines_str};
+use crate::parser::{parse_txt_header_str, parse_txt_lines_str};
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use structs::TXTSong;
+use crate::structs::TXTSong;
 
 error_chain!{
     errors {

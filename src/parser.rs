@@ -1,7 +1,7 @@
 use regex::Regex;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use structs::{Header, Line, Note};
+use crate::structs::{Header, Line, Note};
 
 error_chain!{
     errors {

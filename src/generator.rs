@@ -1,4 +1,4 @@
-use structs::*;
+use crate::structs::*;
 
 error_chain!{
     errors {
