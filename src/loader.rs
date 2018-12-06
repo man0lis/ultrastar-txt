@@ -60,7 +60,7 @@ fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
 }
 
 fn canonicalize_path<P: AsRef<Path>, B: AsRef<Path>>(
-    path: Option<P>,
+    path: &Option<P>,
     base_path: B,
 ) -> Result<Option<PathBuf>> {
     Ok(if let Some(ref path) = path {
@@ -93,13 +93,13 @@ pub fn parse_txt_song<P: AsRef<Path>>(path: P) -> Result<TXTSong> {
     if let Some(base_path) = path.parent() {
         // canonicalize audio path
         txt_song.header.audio_path =
-            canonicalize_path(Some(txt_song.header.audio_path), base_path)?.unwrap();
+            canonicalize_path(&Some(txt_song.header.audio_path), base_path)?.unwrap();
 
         // canonicalize other path
-        txt_song.header.video_path = canonicalize_path(txt_song.header.video_path, base_path)?;
-        txt_song.header.cover_path = canonicalize_path(txt_song.header.cover_path, base_path)?;
+        txt_song.header.video_path = canonicalize_path(&txt_song.header.video_path, base_path)?;
+        txt_song.header.cover_path = canonicalize_path(&txt_song.header.cover_path, base_path)?;
         txt_song.header.background_path =
-            canonicalize_path(txt_song.header.background_path, base_path)?;
+            canonicalize_path(&txt_song.header.background_path, base_path)?;
     }
 
     Ok(txt_song)

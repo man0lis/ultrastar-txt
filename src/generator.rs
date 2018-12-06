@@ -16,16 +16,16 @@ error_chain!{
 /// * header - the Header struct of the song
 /// * lines - a vector of the songs lines
 ///
-pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String> {
+pub fn generate_song_txt(header: &Header, lines: &[Line]) -> Result<String> {
     // generate header
     let mp3_str = match header.audio_path.to_str() {
         Some(x) => x,
         None => bail!(ErrorKind::InvalidPathEncoding("MP3")),
     };
-    let mut song_txt_str = String::from(format!(
+    let mut song_txt_str = format!(
         "#TITLE:{}\n#ARTIST:{}\n#MP3:{}\n#BPM:{}\n",
         header.title, header.artist, mp3_str, header.bpm
-    ));
+    );
     if let Some(gap) = header.gap {
         song_txt_str.push_str(&format!("#GAP:{}\n", gap));
     }
@@ -88,29 +88,29 @@ pub fn generate_song_txt(header: &Header, lines: &Vec<Line>) -> Result<String> {
             }
         }
         for note in line.notes.iter() {
-            match note {
-                &Note::Regular {
+            match *note {
+                Note::Regular {
                     start,
                     duration,
                     pitch,
                     ref text,
                 } => song_txt_str
                     .push_str(format!(": {} {} {} {}\n", start, duration, pitch, text).as_ref()),
-                &Note::Golden {
+                Note::Golden {
                     start,
                     duration,
                     pitch,
                     ref text,
                 } => song_txt_str
                     .push_str(format!("* {} {} {} {}\n", start, duration, pitch, text).as_ref()),
-                &Note::Freestyle {
+                Note::Freestyle {
                     start,
                     duration,
                     pitch,
                     ref text,
                 } => song_txt_str
                     .push_str(format!("F {} {} {} {}\n", start, duration, pitch, text).as_ref()),
-                &Note::PlayerChange { player } => {
+                Note::PlayerChange { player } => {
                     song_txt_str.push_str(format!("P{}\n", player).as_ref())
                 }
             };

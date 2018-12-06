@@ -69,9 +69,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
         static ref RE: Regex = Regex::new(r"#([A-Z3a-z]*):(.*)").unwrap();
     }
 
-    let mut line_count = 0;
-    for line in txt_str.lines() {
-        line_count += 1;
+    for (line, line_count) in txt_str.lines().zip(1..) {
         let cap = match RE.captures(line) {
             Some(x) => x,
             None => break,
@@ -234,14 +232,14 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
     }
 
     // build header from Options
-    if let (Some(title), Some(artist), Some(bpm), Some(auto_path)) =
+    if let (Some(title), Some(artist), Some(bpm), Some(audio_path)) =
         (opt_title, opt_artist, opt_bpm, opt_audio_path)
     {
         let header = Header {
-            title: title,
-            artist: artist,
-            bpm: bpm,
-            audio_path: auto_path,
+            title,
+            artist,
+            bpm,
+            audio_path,
 
             gap: opt_gap,
             cover_path: opt_cover_path,
@@ -284,10 +282,8 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>> {
         notes: Vec::new(),
     };
 
-    let mut line_count = 0;
     let mut found_end_indicator = false;
-    for line in txt_str.lines() {
-        line_count += 1;
+    for (line, line_count) in txt_str.lines().zip(1..) {
 
         let first_char = match line.chars().nth(0) {
             Some(x) => x,
