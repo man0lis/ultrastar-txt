@@ -1,6 +1,6 @@
 use crate::structs::*;
 
-error_chain!{
+error_chain! {
     errors {
         #[doc="the path encoding is invalid"]
         InvalidPathEncoding(tag: &'static str) {

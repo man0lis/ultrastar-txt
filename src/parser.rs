@@ -1,9 +1,9 @@
+use crate::structs::{Header, Line, Note};
 use regex::Regex;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use crate::structs::{Header, Line, Note};
 
-error_chain!{
+error_chain! {
     errors {
         #[doc="duplicate header tag was found"]
         DuplicateHeader(line: u32, tag: &'static str) {
@@ -284,7 +284,6 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>> {
 
     let mut found_end_indicator = false;
     for (line, line_count) in txt_str.lines().zip(1..) {
-
         let first_char = match line.chars().nth(0) {
             Some(x) => x,
             None => bail!(ErrorKind::ParserFailure(line_count)),
@@ -318,11 +317,13 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>> {
                 }
             };
             let note_duration = match cap.get(3).unwrap().as_str().parse() {
-                Ok(x) => if x >= 0 {
-                    x
-                } else {
-                    bail!(ErrorKind::ValueError(line_count, "note duration"));
-                },
+                Ok(x) => {
+                    if x >= 0 {
+                        x
+                    } else {
+                        bail!(ErrorKind::ValueError(line_count, "note duration"));
+                    }
+                }
                 Err(_) => {
                     bail!(ErrorKind::ValueError(line_count, "note duration"));
                 }

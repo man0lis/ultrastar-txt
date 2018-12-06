@@ -2,12 +2,12 @@ extern crate chardet;
 extern crate encoding;
 
 use crate::parser::{parse_txt_header_str, parse_txt_lines_str};
+use crate::structs::TXTSong;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use crate::structs::TXTSong;
 
-error_chain!{
+error_chain! {
     errors {
         #[doc="input output error while handling the file"]
         IOError {
