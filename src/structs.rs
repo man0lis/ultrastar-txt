@@ -1,7 +1,11 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+#[cfg(feature = "serde")]
+use serde::{Serialize, Deserialize};
+
 /// Describes the Header of an Ultrastar Song
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(PartialEq, Clone, Debug)]
 pub struct Header {
     // mandatory data from headers
@@ -58,6 +62,7 @@ pub struct Header {
 
 /// Describes an Ultrastar song as the combination of its Header and its Lines
 #[derive(PartialEq, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TXTSong {
     /// the header of the song
     pub header: Header,
@@ -67,6 +72,7 @@ pub struct TXTSong {
 
 /// Describes the different types of notes the parser might encounter
 #[derive(PartialEq, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Note {
     /// a regular note
     Regular {
@@ -163,6 +169,7 @@ impl Note {
 
 /// Describes a line or sentence that is made up of notes their syllables
 #[derive(PartialEq, Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Line {
     /// the start of the line in beats
     pub start: i32,
