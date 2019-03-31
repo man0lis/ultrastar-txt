@@ -18,7 +18,7 @@ error_chain! {
         #[doc="value could not be parsed"]
         ValueError(line: u32, field: &'static str) {
             description("could not parse value")
-            display("could not parse {} in line: {}", line, field)
+            display("could not parse {} in line: {}", field, line)
         }
         #[doc="an unknown note type was found"]
         UnknownNoteType(line: u32) {
