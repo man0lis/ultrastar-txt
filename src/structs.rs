@@ -15,13 +15,18 @@ error_chain! {
     }
 }
 
+/// Describes the location of a file, either as a Url or a local path
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(PartialEq, Clone, Debug)]
 pub enum Source {
+    /// the Url to a (possibly remote) resource
     Remote(Url),
-    Local(PathBuf)
+    /// the Path to a local file
+    Local(PathBuf),
 }
 
 impl Source {
+    /// convert the Url, respectively the path to a string
     pub fn to_str(&self) -> Option<&str> {
         match self {
             Source::Remote(url) => Some(url.as_str()),
@@ -29,7 +34,8 @@ impl Source {
         }
     }
 
-    pub fn parse(input_value: &str) -> Self { 
+    /// attempt to parse a given string as an url or, if that fails, as a path
+    pub fn parse(input_value: &str) -> Self {
         if let Ok(x) = Url::parse(input_value) {
             Source::Remote(x)
         } else {
