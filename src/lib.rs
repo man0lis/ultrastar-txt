@@ -7,6 +7,7 @@ extern crate error_chain;
 #[macro_use]
 extern crate lazy_static;
 extern crate regex;
+extern crate url;
 
 /// this module contains the generator
 pub mod generator;

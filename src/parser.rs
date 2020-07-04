@@ -1,7 +1,6 @@
-use crate::structs::{Header, Line, Note};
+use crate::structs::{Header, Line, Note, Source};
 use regex::Regex;
 use std::collections::HashMap;
-use std::path::PathBuf;
 
 error_chain! {
     errors {
@@ -99,7 +98,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
             }
             "MP3" => {
                 if opt_audio_path.is_none() {
-                    opt_audio_path = Some(PathBuf::from(value));
+                    opt_audio_path = Some(Source::parse(value));
                 } else {
                     bail!(ErrorKind::DuplicateHeader(line_count, "MP3"));
                 }
@@ -132,21 +131,21 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
             }
             "COVER" => {
                 if opt_cover_path.is_none() {
-                    opt_cover_path = Some(PathBuf::from(value));
+                    opt_cover_path = Some(Source::parse(value));
                 } else {
                     bail!(ErrorKind::DuplicateHeader(line_count, "COVER"));
                 }
             }
             "BACKGROUND" => {
                 if opt_background_path.is_none() {
-                    opt_background_path = Some(PathBuf::from(value));
+                    opt_background_path = Some(Source::parse(value));
                 } else {
                     bail!(ErrorKind::DuplicateHeader(line_count, "BACKGROUND"));
                 }
             }
             "VIDEO" => {
                 if opt_video_path.is_none() {
-                    opt_video_path = Some(PathBuf::from(value));
+                    opt_video_path = Some(Source::parse(value));
                 } else {
                     bail!(ErrorKind::DuplicateHeader(line_count, "VIDEO"));
                 }

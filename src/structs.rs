@@ -1,8 +1,42 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{PathBuf};
+use url::Url;
 
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
+
+error_chain! {
+    errors {
+        #[doc="Path could not be processed"]
+        UnprocessablePath(line: u32, tag: &'static str) {
+            description("unprocessable path")
+            display("{} tag cannot be processed on line: {}", line, tag)
+        }
+    }
+}
+
+#[derive(PartialEq, Clone, Debug)]
+pub enum Source {
+    Remote(Url),
+    Local(PathBuf)
+}
+
+impl Source {
+    pub fn to_str(&self) -> Option<&str> {
+        match self {
+            Source::Remote(url) => Some(url.as_str()),
+            Source::Local(path) => path.to_str(),
+        }
+    }
+
+    pub fn parse(input_value: &str) -> Self { 
+        if let Ok(x) = Url::parse(input_value) {
+            Source::Remote(x)
+        } else {
+            Source::Local(PathBuf::from(input_value))
+        }
+    }
+}
 
 /// Describes the Header of an Ultrastar Song
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -16,17 +50,17 @@ pub struct Header {
     /// the beats per minute of the song
     pub bpm: f32,
     /// the path to the music file
-    pub audio_path: PathBuf,
+    pub audio_path: Source,
 
     // optional data from headers
     /// the gap between the start of the audio file and the first note in milliseconds
     pub gap: Option<f32>,
     /// the path to the cover file of the song
-    pub cover_path: Option<PathBuf>,
+    pub cover_path: Option<Source>,
     /// the path to the background file of the song
-    pub background_path: Option<PathBuf>,
+    pub background_path: Option<Source>,
     /// the path to the video file of the song
-    pub video_path: Option<PathBuf>,
+    pub video_path: Option<Source>,
     /// the time offset of the video file to the audio file
     pub video_gap: Option<f32>,
     /// the genre of the song
