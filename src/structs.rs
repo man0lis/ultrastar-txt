@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::path::{PathBuf};
+#[cfg(feature = "url-support")]
 use url::Url;
 
 #[cfg(feature = "serde")]
@@ -20,6 +21,7 @@ error_chain! {
 #[derive(PartialEq, Clone, Debug)]
 pub enum Source {
     /// the Url to a (possibly remote) resource
+    #[cfg(feature = "url-support")]
     Remote(Url),
     /// the Path to a local file
     Local(PathBuf),
@@ -29,6 +31,7 @@ impl Source {
     /// convert the Url, respectively the path to a string
     pub fn to_str(&self) -> Option<&str> {
         match self {
+            #[cfg(feature = "url-support")]
             Source::Remote(url) => Some(url.as_str()),
             Source::Local(path) => path.to_str(),
         }
@@ -36,11 +39,13 @@ impl Source {
 
     /// attempt to parse a given string as an url or, if that fails, as a path
     pub fn parse(input_value: &str) -> Self {
-        if let Ok(x) = Url::parse(input_value) {
-            Source::Remote(x)
-        } else {
-            Source::Local(PathBuf::from(input_value))
-        }
+        #[cfg(feature = "url-support")]
+            {
+                if let Ok(x) = Url::parse(input_value) {
+                    return Source::Remote(x);
+                }
+            }
+        Source::Local(PathBuf::from(input_value))
     }
 }
 

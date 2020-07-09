@@ -65,6 +65,7 @@ fn canonicalize_path<B: AsRef<Path>>(
 ) -> Result<Option<Source>> {
     Ok( if let Some(source) = path {
         Some(match source {
+            #[cfg(feature = "url-support")]
             Source::Remote(x) => Source::Remote(x.to_owned()),
             Source::Local(x) => {
                 let mut tmp_path = PathBuf::from(base_path.as_ref());
