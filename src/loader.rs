@@ -55,7 +55,7 @@ fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
                     let mut chars = x.chars();
                     let first = chars.next().unwrap();
                     if first == '\u{feff}' {
-                        chars.join("");
+                        chars.as_str().to_string()
                     } else {
                         x
                     }
