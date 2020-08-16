@@ -51,7 +51,7 @@ fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
     let file_content = match coder {
         Some(c) => match c.decode(&reader, encoding::DecoderTrap::Ignore) {
             Ok(x) => {
-                if x.len() > 0 && (whtwg_label == "utf8" || whtwg_label == "utf-8") {
+                if x.len() > 0 && vec!["utf-8", "utf8"].contains(&&*whtwg_label.to_lowercase()) {
                     let mut chars = x.chars();
                     let first = chars.next().unwrap();
                     if first == '\u{feff}' {
