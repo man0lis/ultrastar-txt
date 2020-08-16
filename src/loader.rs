@@ -23,8 +23,9 @@ error_chain! {
             display("decoding error: {}", msg)
         }
         #[doc="error in path canonicalization"]
-        CanonicalizationError {
+        CanonicalizationError(msg: String) {
             description("canonicalization error")
+            display("canonicalization error: {}", msg)
         }
         #[doc="error in parsing the song header"]
         HeaderParsingError {
@@ -72,7 +73,7 @@ fn canonicalize_path<B: AsRef<Path>>(
                 tmp_path.push(x);
                 let result = tmp_path
                     .canonicalize()
-                    .chain_err(|| ErrorKind::CanonicalizationError)?;
+                    .chain_err(|| ErrorKind::CanonicalizationError(format!("{:?}", tmp_path)))?;
                 Source::Local(result)
             }
         })
