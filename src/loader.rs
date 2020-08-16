@@ -48,13 +48,22 @@ fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
     let chardet_result = chardet::detect(&reader);
     let whtwg_label = chardet::charset2encoding(&chardet_result.0);
     let coder = encoding::label::encoding_from_whatwg_label(whtwg_label);
-    let file_content = match coder {
+    let mut file_content = match coder {
         Some(c) => match c.decode(&reader, encoding::DecoderTrap::Ignore) {
             Ok(x) => x,
             Err(e) => bail!(ErrorKind::DecodingError(e.into_owned())),
         },
         None => bail!(ErrorKind::EncodingDetectionError),
     };
+
+    // handle UTF8 BOM manually
+    if file_content.len() > 0 {
+        let mut chars = file_content.chars();
+        let first = chars.next().unwrap();
+        if first == '\u{feff}' {
+            file_content = chars.join("");
+        }
+    }
 
     Ok(file_content)
 }
