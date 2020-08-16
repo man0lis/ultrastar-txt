@@ -10,8 +10,9 @@ error_chain! {
             display("additional {} tag found in line: {}", line, tag)
         }
         #[doc="an essential header is missing"]
-        MissingEssential {
+        MissingEssential(fields: Vec<String>) {
             description("essential header is missing")
+            display("essential header is missing. Missing headers: {:?}", fields)
         }
 
         #[doc="value could not be parsed"]
@@ -232,7 +233,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
 
     // build header from Options
     if let (Some(title), Some(artist), Some(bpm), Some(audio_path)) =
-        (opt_title, opt_artist, opt_bpm, opt_audio_path)
+        (opt_title.clone(), opt_artist.clone(), opt_bpm.clone(), opt_audio_path.clone())
     {
         let header = Header {
             title,
@@ -255,8 +256,13 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
         // header complete
         Ok(header)
     } else {
+        let mut fields = Vec::new();
+        if opt_title.is_none() { fields.push("Title".to_string()) }
+        if opt_artist.is_none() { fields.push("Artist".to_string()) }
+        if opt_bpm.is_none() { fields.push("BPM".to_string()) }
+        if opt_audio_path.is_none() { fields.push("Audio Path".to_string()) }
         // essential field is missing
-        bail!(ErrorKind::MissingEssential)
+        bail!(ErrorKind::MissingEssential(fields))
     }
 }
 
