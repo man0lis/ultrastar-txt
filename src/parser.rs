@@ -7,7 +7,7 @@ error_chain! {
         #[doc="duplicate header tag was found"]
         DuplicateHeader(line: u32, tag: &'static str) {
             description("duplicate header")
-            display("additional {} tag found in line: {}", line, tag)
+            display("additional {} tag found in line: {}", tag, line)
         }
         #[doc="an essential header is missing"]
         MissingEssential {
@@ -36,7 +36,7 @@ error_chain! {
         #[doc="song file uses a feature that is not implemented"]
         NotImplemented(line: u32, feature: &'static str) {
             description("not implemented")
-            display("the feature {} in line {} is not implemented", line, feature)
+            display("the feature {} in line {} is not implemented", feature, line)
         }
     }
 }
