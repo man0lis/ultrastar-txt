@@ -283,6 +283,11 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>> {
 
     let mut found_end_indicator = false;
     for (line, line_count) in txt_str.lines().zip(1..) {
+        // ignore empty lines
+        if line == "" {
+            continue;
+        }
+
         let first_char = match line.chars().next() {
             Some(x) => x,
             None => bail!(ErrorKind::ParserFailure(line_count)),
