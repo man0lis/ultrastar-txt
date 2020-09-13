@@ -66,7 +66,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
     let mut opt_unknown: Option<HashMap<String, String>> = None;
 
     lazy_static! {
-        static ref RE: Regex = Regex::new(r"#([A-Z3a-z]*):(.*)").unwrap();
+        static ref RE: Regex = Regex::new(r"#([A-Z1-3a-z]*):(.*)").unwrap();
     }
 
     for (line, line_count) in txt_str.lines().zip(1..) {
