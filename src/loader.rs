@@ -2,7 +2,7 @@ extern crate chardet;
 extern crate encoding;
 
 use crate::parser::{parse_txt_header_str, parse_txt_lines_str};
-use crate::structs::TXTSong;
+use crate::structs::{TXTSong, Source};
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -59,23 +59,29 @@ fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
     Ok(file_content)
 }
 
-fn canonicalize_path<P: AsRef<Path>, B: AsRef<Path>>(
-    path: &Option<P>,
+fn canonicalize_path<B: AsRef<Path>>(
+    path: &Option<Source>,
     base_path: B,
-) -> Result<Option<PathBuf>> {
-    Ok(if let Some(ref path) = path {
-        let mut tmp_path = PathBuf::from(base_path.as_ref());
-        tmp_path.push(path);
-        let result = tmp_path
-            .canonicalize()
-            .chain_err(|| ErrorKind::CanonicalizationError)?;
-        Some(result)
+) -> Result<Option<Source>> {
+    Ok( if let Some(source) = path {
+        Some(match source {
+            #[cfg(feature = "url-support")]
+            Source::Remote(x) => Source::Remote(x.to_owned()),
+            Source::Local(x) => {
+                let mut tmp_path = PathBuf::from(base_path.as_ref());
+                tmp_path.push(x);
+                let result = tmp_path
+                    .canonicalize()
+                    .chain_err(|| ErrorKind::CanonicalizationError)?;
+                Source::Local(result)
+            }
+        })
     } else {
         None
     })
 }
 
-/// Takes path to a song file and returns TXTSong struct with canonicalized paths
+/// Takes path to a song file and returns TXTSong struct with canonicalized local sources
 ///
 /// # Arguments
 /// * path - the path to the song file to parse

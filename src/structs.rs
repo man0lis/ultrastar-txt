@@ -1,8 +1,53 @@
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{PathBuf};
+#[cfg(feature = "url-support")]
+use url::Url;
 
 #[cfg(feature = "serde")]
 use serde::{Serialize, Deserialize};
+
+error_chain! {
+    errors {
+        #[doc="Path could not be processed"]
+        UnprocessablePath(line: u32, tag: &'static str) {
+            description("unprocessable path")
+            display("{} tag cannot be processed on line: {}", line, tag)
+        }
+    }
+}
+
+/// Describes the location of a file, either as a Url or a local path
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(PartialEq, Clone, Debug)]
+pub enum Source {
+    /// the Url to a (possibly remote) resource
+    #[cfg(feature = "url-support")]
+    Remote(Url),
+    /// the Path to a local file
+    Local(PathBuf),
+}
+
+impl Source {
+    /// convert the Url, respectively the path to a string
+    pub fn to_str(&self) -> Option<&str> {
+        match self {
+            #[cfg(feature = "url-support")]
+            Source::Remote(url) => Some(url.as_str()),
+            Source::Local(path) => path.to_str(),
+        }
+    }
+
+    /// attempt to parse a given string as an url or, if that fails, as a path
+    pub fn parse(input_value: &str) -> Self {
+        #[cfg(feature = "url-support")]
+            {
+                if let Ok(x) = Url::parse(input_value) {
+                    return Source::Remote(x);
+                }
+            }
+        Source::Local(PathBuf::from(input_value))
+    }
+}
 
 /// Describes the Header of an Ultrastar Song
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -16,17 +61,17 @@ pub struct Header {
     /// the beats per minute of the song
     pub bpm: f32,
     /// the path to the music file
-    pub audio_path: PathBuf,
+    pub audio_path: Source,
 
     // optional data from headers
     /// the gap between the start of the audio file and the first note in milliseconds
     pub gap: Option<f32>,
     /// the path to the cover file of the song
-    pub cover_path: Option<PathBuf>,
+    pub cover_path: Option<Source>,
     /// the path to the background file of the song
-    pub background_path: Option<PathBuf>,
+    pub background_path: Option<Source>,
     /// the path to the video file of the song
-    pub video_path: Option<PathBuf>,
+    pub video_path: Option<Source>,
     /// the time offset of the video file to the audio file
     pub video_gap: Option<f32>,
     /// the genre of the song
