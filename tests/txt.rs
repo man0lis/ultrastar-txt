@@ -1,7 +1,6 @@
 extern crate ultrastar_txt;
 
 use std::collections::HashMap;
-use std::path::PathBuf;
 use ultrastar_txt::*;
 
 // usage:
@@ -355,12 +354,12 @@ fn get_simple_txt_header() -> Header {
         artist: String::from("Testartist"),
         title: String::from("Testsong"),
         bpm: 123.0,
-        audio_path: PathBuf::from("Testfile.mp3"),
+        audio_path: Source::parse("Testfile.mp3"),
         gap: Some(666.0),
         relative: Some(false),
-        video_path: Some(PathBuf::from("DLzxrzFCyOs.mp4")),
-        cover_path: Some(PathBuf::from("Cover.jpg")),
-        background_path: Some(PathBuf::from("BG.jpg")),
+        video_path: Some(Source::parse("DLzxrzFCyOs.mp4")),
+        cover_path: Some(Source::parse("Cover.jpg")),
+        background_path: Some(Source::parse("BG.jpg")),
         video_gap: Some(777.0),
         genre: Some(String::from("Music")),
         edition: Some(String::from("Testmusic")),
