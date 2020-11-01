@@ -356,6 +356,17 @@ fn remote_url_audio() {
                Source::Remote(Url::parse("https://www.example.com/Testfile.mp3").unwrap()));
 }
 
+#[test]
+fn duet_headings() {
+    let txt = include_str!("txts/duet_headings.txt");
+    let mut header = get_simple_txt_header();
+    let mut unknown = HashMap::new();
+    unknown.insert(String::from("P1"), String::from("Singer 1"));
+    unknown.insert(String::from("P2"), String::from("Singer 2"));
+    header.unknown = Some(unknown);
+    assert_eq!(parse_txt_header_str(txt).unwrap(), header);
+}
+
 fn get_simple_txt_str() -> &'static str {
     include_str!("txts/simple_txt_with_all_features.txt")
 }
