@@ -105,7 +105,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
             }
             "BPM" => {
                 if opt_bpm.is_none() {
-                    opt_bpm = match value.replace(",", ".").parse() {
+                    opt_bpm = match value.trim().replace(",", ".").parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
                             bail!(ErrorKind::ValueError(line_count, "BPM"));
@@ -119,7 +119,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
             // Optional Header fields
             "GAP" => {
                 if opt_gap.is_none() {
-                    opt_gap = match value.replace(",", ".").parse() {
+                    opt_gap = match value.trim().replace(",", ".").parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
                             bail!(ErrorKind::ValueError(line_count, "GAP"));
@@ -152,7 +152,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
             }
             "VIDEOGAP" => {
                 if opt_video_gap.is_none() {
-                    opt_video_gap = match value.replace(",", ".").parse() {
+                    opt_video_gap = match value.trim().replace(",", ".").parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
                             bail!(ErrorKind::ValueError(line_count, "VIDEOGAP"));
@@ -185,7 +185,7 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
             }
             "YEAR" => {
                 if opt_year.is_none() {
-                    opt_year = match value.parse() {
+                    opt_year = match value.trim().parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
                             bail!(ErrorKind::ValueError(line_count, "YEAR"));
