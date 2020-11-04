@@ -1,0 +1,26 @@
+#TITLE:Testsong
+#ARTIST:Testartist
+#MP3:https://www.example.com/Testfile.mp3
+#GAP:666
+#BPM:123
+#GENRE:Music
+#EDITION:Testmusic
+#COVER:Cover.jpg
+#BACKGROUND:BG.jpg
+#VIDEO:DLzxrzFCyOs.mp4
+#VIDEOGAP:777
+#RELATIVE:NO
+#LANGUAGE:en
+#YEAR:1337
+: 0 4 59 Test 
+: 4 4 59 I
+: 8 4 59 'm 
+* 12 4 59 test
+: 16 4 59 ing.
+- 20
+: 24 4 59 Test 
+: 28 4 59 I
+: 32 4 59 'm 
+F 36 4 59 test
+F 40 4 59 ing.
+E
