@@ -23,16 +23,19 @@ error_chain! {
             display("decoding error: {}", msg)
         }
         #[doc="error in path canonicalization"]
-        CanonicalizationError {
+        CanonicalizationError(msg: String) {
             description("canonicalization error")
+            display("canonicalization error: {}", msg)
         }
         #[doc="error in parsing the song header"]
-        HeaderParsingError {
+        HeaderParsingError(msg: String) {
             description("header parsing error")
+            display("header parsing error: {}", msg)
         }
         #[doc="error in parsing the songs lines"]
-        LinesParsingError {
+        LinesParsingError(msg: String) {
             description("lines parsing error")
+            display("lines parsing error: {}", msg)
         }
     }
 }
@@ -72,7 +75,7 @@ fn canonicalize_path<B: AsRef<Path>>(
                 tmp_path.push(x);
                 let result = tmp_path
                     .canonicalize()
-                    .chain_err(|| ErrorKind::CanonicalizationError)?;
+                    .chain_err(|| ErrorKind::CanonicalizationError(format!("{:?}", tmp_path)))?;
                 Source::Local(result)
             }
         })
@@ -91,8 +94,22 @@ pub fn parse_txt_song<P: AsRef<Path>>(path: P) -> Result<TXTSong> {
     let txt = read_file_to_string(path)?;
 
     let mut txt_song = TXTSong {
-        header: parse_txt_header_str(txt.as_ref()).chain_err(|| ErrorKind::HeaderParsingError)?,
-        lines: parse_txt_lines_str(txt.as_ref()).chain_err(|| ErrorKind::LinesParsingError)?,
+        header: parse_txt_header_str(txt.as_ref())
+            .map_err(|e| {
+                let s = e.to_string();
+                Error::with_chain(
+                    e,
+                    ErrorKind::HeaderParsingError(s),
+                )
+            })?,
+        lines: parse_txt_lines_str(txt.as_ref())
+            .map_err(|e| {
+                let s = e.to_string();
+                Error::with_chain(
+                    e,
+                    ErrorKind::LinesParsingError(s)
+                )
+            })?,
     };
 
     // canonicalize paths
