@@ -78,10 +78,26 @@ pub struct Header {
     pub genre: Option<String>,
     /// the edition/category of the song
     pub edition: Option<String>,
+    /// the album of the song
+    pub album: Option<String>,
     /// the language the song is in
     pub language: Option<String>,
     /// the year the song is from
     pub year: Option<u32>,
+    /// the start in the medley modus om beats
+    pub medley_start: Option<i32>,
+    /// the end in the medley modus om beats
+    pub medley_end: Option<i32>,
+    /// the start of the in seconds
+    pub preview_start: Option<f32>,
+    /// the start of the song in seconds (doesn't affect gap or synchronization)
+    pub start: Option<f32>,
+    /// the end of the song in milliseconds
+    pub end: Option<f32>,
+    /// the name of the first singer in a duet
+    pub duet_singer1: Option<String>,
+    /// the name of the second singer in a duet
+    pub duet_singer2: Option<String>,
 
     /* header fields todo
     // these are header fields parsed by ultrastar deluxe

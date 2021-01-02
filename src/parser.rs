@@ -59,9 +59,17 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
     let mut opt_video_gap = None;
     let mut opt_genre = None;
     let mut opt_edition = None;
+    let mut opt_album = None;
     let mut opt_language = None;
     let mut opt_year = None;
     let mut opt_relative = None;
+    let mut opt_medley_start = None;
+    let mut opt_medley_end = None;
+    let mut opt_preview_start = None;
+    let mut opt_start = None;
+    let mut opt_end = None;
+    let mut opt_duet_singer1 = None;
+    let mut opt_duet_singer2 = None;
     let mut opt_unknown: Option<HashMap<String, String>> = None;
 
     lazy_static! {
@@ -176,6 +184,13 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
                     bail!(ErrorKind::DuplicateHeader(line_count, "EDITION"));
                 }
             }
+            "ALBUM" => {
+                if opt_album.is_none() {
+                    opt_album = Some(String::from(value));
+                } else {
+                    bail!(ErrorKind::DuplicateHeader(line_count, "ALBUM"));
+                }
+            }
             "LANGUAGE" => {
                 if opt_language.is_none() {
                     opt_language = Some(String::from(value));
@@ -207,6 +222,80 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
                     }
                 } else {
                     bail!(ErrorKind::DuplicateHeader(line_count, "RELATIVE"));
+                }
+            }
+            "MEDLEYSTARTBEAT" => {
+                if opt_medley_start.is_none() {
+                    opt_medley_start = match value.trim().replace(",", ".").parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => {
+                            bail!(ErrorKind::ValueError(line_count, "MEDLEYSTARTBEAT"));
+                        }
+                    };
+                } else {
+                    bail!(ErrorKind::DuplicateHeader(line_count, "MEDLEYSTARTBEAT"));
+                }
+            }
+            "MEDLEYENDBEAT" => {
+                if opt_medley_end.is_none() {
+                    opt_medley_end = match value.trim().replace(",", ".").parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => {
+                            bail!(ErrorKind::ValueError(line_count, "MEDLEYENDBEAT"));
+                        }
+                    };
+                } else {
+                    bail!(ErrorKind::DuplicateHeader(line_count, "MEDLEYENDBEAT"));
+                }
+            }
+            "PREVIEWSTART" => {
+                if opt_preview_start.is_none() {
+                    opt_preview_start = match value.trim().replace(",", ".").parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => {
+                            bail!(ErrorKind::ValueError(line_count, "PREVIEWSTART"));
+                        }
+                    };
+                } else {
+                    bail!(ErrorKind::DuplicateHeader(line_count, "PREVIEWSTART"));
+                }
+            }
+            "START" => {
+                if opt_start.is_none() {
+                    opt_start = match value.trim().replace(",", ".").parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => {
+                            bail!(ErrorKind::ValueError(line_count, "START"));
+                        }
+                    };
+                } else {
+                    bail!(ErrorKind::DuplicateHeader(line_count, "START"));
+                }
+            }
+            "END" => {
+                if opt_end.is_none() {
+                    opt_end = match value.trim().replace(",", ".").parse() {
+                        Ok(x) => Some(x),
+                        Err(_) => {
+                            bail!(ErrorKind::ValueError(line_count, "END"));
+                        }
+                    };
+                } else {
+                    bail!(ErrorKind::DuplicateHeader(line_count, "END"));
+                }
+            }
+            "P1" | "DUETSINGERP1" => {
+                if opt_duet_singer1.is_none() {
+                    opt_duet_singer1 = Some(String::from(value));
+                } else {
+                    bail!(ErrorKind::DuplicateHeader(line_count, "DUETSINGERP1"));
+                }
+            }
+            "P2" | "DUETSINGERP2" => {
+                if opt_duet_singer2.is_none() {
+                    opt_duet_singer2 = Some(String::from(value));
+                } else {
+                    bail!(ErrorKind::DuplicateHeader(line_count, "DUETSINGERP2"));
                 }
             }
             // use hashmap to store unknown tags
@@ -247,8 +336,16 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
             video_gap: opt_video_gap,
             genre: opt_genre,
             edition: opt_edition,
+            album: opt_album,
             language: opt_language,
             year: opt_year,
+            medley_start: opt_medley_start,
+            medley_end: opt_medley_end,
+            preview_start: opt_preview_start,
+            start: opt_start,
+            end: opt_end,
+            duet_singer1: opt_duet_singer1,
+            duet_singer2: opt_duet_singer2,
             relative: opt_relative,
             unknown: opt_unknown,
         };

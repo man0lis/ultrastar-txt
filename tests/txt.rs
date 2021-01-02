@@ -374,9 +374,17 @@ fn get_simple_txt_header() -> Header {
         video_gap: Some(777.0),
         genre: Some(String::from("Music")),
         edition: Some(String::from("Testmusic")),
+        album: None,
         language: Some(String::from("en")),
         year: Some(1337),
+        medley_start: None,
+        medley_end: None,
+        preview_start: None,
+        start: None,
+        end: None,
+        duet_singer1: None,
         unknown: None,
+        duet_singer2: None
     }
 }
 

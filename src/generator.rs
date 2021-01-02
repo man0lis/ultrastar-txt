@@ -26,6 +26,9 @@ pub fn generate_song_txt(header: &Header, lines: &[Line]) -> Result<String> {
         "#TITLE:{}\n#ARTIST:{}\n#MP3:{}\n#BPM:{}\n",
         header.title, header.artist, mp3_str, header.bpm
     );
+    if let Some(album) = header.album.clone() {
+        song_txt_str.push_str(&format!("#ALBUM:{}\n", album));
+    }
     if let Some(gap) = header.gap {
         song_txt_str.push_str(&format!("#GAP:{}\n", gap));
     }
@@ -52,6 +55,21 @@ pub fn generate_song_txt(header: &Header, lines: &[Line]) -> Result<String> {
     }
     if let Some(videogap) = header.video_gap {
         song_txt_str.push_str(&format!("#VIDEOGAP:{}\n", videogap));
+    }
+    if let Some(medley_start) = header.medley_start {
+        song_txt_str.push_str(&format!("#MEDLEYSTARTBEAT:{}\n", medley_start));
+    }
+    if let Some(medley_end) = header.medley_end {
+        song_txt_str.push_str(&format!("#MEDLEYENDBEAT:{}\n", medley_end));
+    }
+    if let Some(preview_start) = header.preview_start {
+        song_txt_str.push_str(&format!("#PREVIEWSTART:{}\n", preview_start));
+    }
+    if let Some(start) = header.start {
+        song_txt_str.push_str(&format!("#START:{}\n", start));
+    }
+    if let Some(end) = header.end {
+        song_txt_str.push_str(&format!("#END:{}\n", end));
     }
     if let Some(genre) = header.genre.clone() {
         song_txt_str.push_str(&format!("#GENRE:{}\n", genre));
