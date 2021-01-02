@@ -152,6 +152,28 @@ pub enum Note {
         /// text or syllable of the note
         text: String,
     },
+    /// a rap note (pitch is ignored, normal points)
+    Rap {
+        /// start of the note
+        start: i32,
+        /// duration of the note
+        duration: i32,
+        /// pitch of the note (in semitones with C2 being 0)
+        pitch: i32, //pitch might not be needed but not including it might lose data from orig file
+        /// text or syllable of the note
+        text: String,
+    },
+    /// a golden rap note (pitch is ignored, 2x points)
+    RapGolden {
+        /// start of the note
+        start: i32,
+        /// duration of the note
+        duration: i32,
+        /// pitch of the note (in semitones with C2 being 0)
+        pitch: i32, //pitch might not be needed but not including it might lose data from orig file
+        /// text or syllable of the note
+        text: String,
+    },
     /// player change indicator for duet mode
     PlayerChange {
         /// player to change to
@@ -168,7 +190,9 @@ impl Note {
         match *self {
             Note::Regular { start, .. }
             | Note::Golden { start, .. }
-            | Note::Freestyle { start, .. } => Some(start),
+            | Note::Freestyle { start, .. }
+            | Note::Rap { start, .. }
+            | Note::RapGolden { start, .. } => Some(start),
             Note::PlayerChange { .. } => None,
         }
     }
@@ -178,7 +202,9 @@ impl Note {
         match *self {
             Note::Regular { duration, .. }
             | Note::Golden { duration, .. }
-            | Note::Freestyle { duration, .. } => Some(duration),
+            | Note::Freestyle { duration, .. }
+            | Note::Rap { duration, .. }
+            | Note::RapGolden { duration, .. } => Some(duration),
             Note::PlayerChange { .. } => None,
         }
     }
@@ -188,7 +214,9 @@ impl Note {
         match *self {
             Note::Regular { pitch, .. }
             | Note::Golden { pitch, .. }
-            | Note::Freestyle { pitch, .. } => Some(pitch),
+            | Note::Freestyle { pitch, .. }
+            | Note::Rap { pitch, .. }
+            | Note::RapGolden { pitch, .. } => Some(pitch),
             Note::PlayerChange { .. } => None,
         }
     }
@@ -198,7 +226,9 @@ impl Note {
         match *self {
             Note::Regular { ref text, .. }
             | Note::Golden { ref text, .. }
-            | Note::Freestyle { ref text, .. } => Some(text),
+            | Note::Freestyle { ref text, .. }
+            | Note::Rap { ref text, .. }
+            | Note::RapGolden { ref text, .. } => Some(text),
             Note::PlayerChange { .. } => None,
         }
     }
@@ -207,7 +237,7 @@ impl Note {
     pub fn player(&self) -> Option<i32> {
         match *self {
             Note::PlayerChange { player, .. } => Some(player),
-            Note::Regular { .. } | Note::Golden { .. } | Note::Freestyle { .. } => None,
+            Note::Regular { .. } | Note::Golden { .. } | Note::Freestyle { .. } | Note::Rap { .. } | Note::RapGolden { .. } => None,
         }
     }
 }

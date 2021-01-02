@@ -110,6 +110,20 @@ pub fn generate_song_txt(header: &Header, lines: &[Line]) -> Result<String> {
                     ref text,
                 } => song_txt_str
                     .push_str(format!("F {} {} {} {}\n", start, duration, pitch, text).as_ref()),
+                Note::Rap {
+                    start,
+                    duration,
+                    pitch,
+                    ref text,
+                } => song_txt_str
+                    .push_str(format!("R {} {} {} {}\n", start, duration, pitch, text).as_ref()),
+                Note::RapGolden {
+                    start,
+                    duration,
+                    pitch,
+                    ref text,
+                } => song_txt_str
+                    .push_str(format!("G {} {} {} {}\n", start, duration, pitch, text).as_ref()),
                 Note::PlayerChange { player } => {
                     song_txt_str.push_str(format!("P{}\n", player).as_ref())
                 }
