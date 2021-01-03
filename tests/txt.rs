@@ -462,6 +462,118 @@ fn generate_and_reparse_song() {
 }
 
 #[test]
+fn generate_and_reparse_duet() {
+    let orig_txt_header = Header {
+        artist: String::from("Testsong"),
+        title: String::from("Testartist"),
+        bpm: 123.0,
+        audio_path: Source::parse("Testfile.mp3"),
+        gap: Some(666.0),
+        cover_path: None,
+        background_path: None,
+        video_path: None,
+        video_gap: None,
+        genre: None,
+        edition: None,
+        album: None,
+        language: None,
+        year: None,
+        medley_start: None,
+        medley_end: None,
+        preview_start: None,
+        start: None,
+        end: None,
+        duet_singer1: Some(String::from("Me")),
+        duet_singer2: Some(String::from("Myself")),
+        relative: None,
+        unknown: None
+    };
+    let orig_txt_lines = vec![
+        Line {
+            start: 0,
+            rel: None,
+            notes: vec![
+                Note::PlayerChange { player: 1 },
+                Note::Regular {
+                    start: 0,
+                    duration: 4,
+                    pitch: -1,
+                    text: String::from("Test "),
+                },
+                Note::Regular {
+                    start: 4,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("I"),
+                },
+                Note::Regular {
+                    start: 8,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("'m "),
+                },
+                Note::Golden {
+                    start: 12,
+                    duration: 2,
+                    pitch: 59,
+                    text: String::from("test"),
+                },
+                Note::Regular {
+                    start: 16,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("ing."),
+                },
+            ],
+        },
+        Line {
+            start: 20,
+            rel: None,
+            notes: vec![
+                Note::PlayerChange { player: 2 },
+                Note::Regular {
+                    start: 24,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("Test "),
+                },
+                Note::Regular {
+                    start: 28,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("I"),
+                },
+                Note::Regular {
+                    start: 32,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("'m "),
+                },
+                Note::Freestyle {
+                    start: 36,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("test"),
+                },
+                Note::Freestyle {
+                    start: 40,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("ing."),
+                },
+            ],
+        },
+    ];
+
+    let generated_txt = generate_song_txt(&orig_txt_header, &orig_txt_lines).unwrap();
+    let parsed_header = parse_txt_header_str(generated_txt.as_ref()).unwrap();
+    let parsed_lines = parse_txt_lines_str(generated_txt.as_ref()).unwrap();
+
+    assert_eq!(parsed_header, orig_txt_header);
+    assert_eq!(parsed_lines, orig_txt_lines);
+}
+
+#[test]
 fn relative_line_breaks() {
     let txt = include_str!("txts/relative_line_breaks.txt");
     let lines = parse_txt_lines_str(txt).unwrap();

@@ -90,6 +90,12 @@ pub fn generate_song_txt(header: &Header, lines: &[Line]) -> Result<String> {
             song_txt_str.push_str("#RELATIVE:NO\n");
         }
     }
+    if let Some(duet_singerp1) = header.duet_singer1.clone() {
+        song_txt_str.push_str(&format!("#DUETSINGERP1:{}\n", duet_singerp1));
+    }
+    if let Some(duet_singerp2) = header.duet_singer2.clone() {
+        song_txt_str.push_str(&format!("#DUETSINGERP2:{}\n", duet_singerp2));
+    }
     if let Some(unknown) = header.unknown.clone() {
         for (key, value) in unknown.iter() {
             song_txt_str.push_str(&format!("#{}:{}\n", key, value));
