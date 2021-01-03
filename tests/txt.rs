@@ -29,6 +29,88 @@ fn simple_txt_lines() {
     assert_eq!(lines, parse_txt_lines_str(txt).unwrap());
 }
 
+
+
+#[test]
+fn rap_notes() {
+    let txt = include_str!("txts/rap_notes.txt");
+    let lines = vec![
+        Line {
+            start: 0,
+            rel: None,
+            notes: vec![
+                Note::Rap {
+                    start: 0,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("Test "),
+                },
+                Note::Rap {
+                    start: 4,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("I"),
+                },
+                Note::Rap {
+                    start: 8,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("'m "),
+                },
+                Note::RapGolden {
+                    start: 12,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("test"),
+                },
+                Note::Rap {
+                    start: 16,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("ing."),
+                },
+            ],
+        },
+        Line {
+            start: 20,
+            rel: None,
+            notes: vec![
+                Note::Golden {
+                    start: 24,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("Test "),
+                },
+                Note::Regular {
+                    start: 28,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("I"),
+                },
+                Note::Regular {
+                    start: 32,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("'m "),
+                },
+                Note::Freestyle {
+                    start: 36,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("test"),
+                },
+                Note::Freestyle {
+                    start: 40,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("ing."),
+                },
+            ],
+        },
+    ];
+    assert_eq!(lines, parse_txt_lines_str(txt).unwrap());
+}
+
 #[test]
 fn komma_in_float_number() {
     let txt = include_str!("txts/komma_in_float.txt");
