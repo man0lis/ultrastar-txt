@@ -1,6 +1,7 @@
 #TITLE:Testsong
 #ARTIST:Testartist
 #ALBUM:Testalbum
+#ALBUM:Testalbum
 #MP3:Testfile.mp3
 #GAP:666
 #BPM:123
@@ -18,8 +19,6 @@
 #RELATIVE:NO
 #LANGUAGE:en
 #YEAR:1337
-#UNKNOWN:tag
-#WHAT:is this
 : 0 4 59 Test 
 : 4 4 59 I
 : 8 4 59 'm 
