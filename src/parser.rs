@@ -359,6 +359,18 @@ pub fn parse_txt_lines_str(txt_str: &str) -> Result<Vec<Line>> {
                     pitch: note_pitch,
                     text: String::from(note_text),
                 },
+                "R" => Note::Rap {
+                    start: note_start,
+                    duration: note_duration,
+                    pitch: note_pitch,
+                    text: String::from(note_text),
+                },
+                "G" => Note::RapGolden {
+                    start: note_start,
+                    duration: note_duration,
+                    pitch: note_pitch,
+                    text: String::from(note_text),
+                },
                 _ => bail!(ErrorKind::UnknownNoteType(line_count)),
             };
 
