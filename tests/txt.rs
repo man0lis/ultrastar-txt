@@ -3,6 +3,7 @@ extern crate ultrastar_txt;
 use std::collections::HashMap;
 use ultrastar_txt::*;
 use url::Url;
+use std::path::Path;
 
 // usage:
 //    assert_error_kind!(some_err, ErrorKind::MyErrorType)
@@ -354,6 +355,12 @@ fn remote_url_audio() {
     assert_eq!(parse_txt_header_str(txt).unwrap(), header);
     assert_eq!(Source::parse("https://www.example.com/Testfile.mp3"), 
                Source::Remote(Url::parse("https://www.example.com/Testfile.mp3").unwrap()));
+}
+
+fn encoding_utf8_bom() {
+    let txt = read_file_to_string(Path::new("tests/txts/encoding_utf8_bom.txt")).unwrap();
+    let header = get_simple_txt_header();
+    assert_eq!(header, parse_txt_header_str(&txt).unwrap());
 }
 
 fn get_simple_txt_str() -> &'static str {

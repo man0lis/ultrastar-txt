@@ -37,7 +37,8 @@ error_chain! {
     }
 }
 
-fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
+#[doc(hidden)]
+pub fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
     let p = p.as_ref();
     let mut f = File::open(p).chain_err(|| ErrorKind::IOError)?;
     let mut reader: Vec<u8> = Vec::new();
@@ -50,7 +51,20 @@ fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
     let coder = encoding::label::encoding_from_whatwg_label(whtwg_label);
     let file_content = match coder {
         Some(c) => match c.decode(&reader, encoding::DecoderTrap::Ignore) {
-            Ok(x) => x,
+            Ok(x) => {
+                // handle UTF8 BOM manually
+                if x.len() > 0 && vec!["utf-8", "utf8"].contains(&&*whtwg_label.to_lowercase()) {
+                    let mut chars = x.chars();
+                    let first = chars.next().unwrap();
+                    if first == '\u{feff}' {
+                        chars.as_str().to_string()
+                    } else {
+                        x
+                    }
+                } else {
+                    x
+                }
+            },
             Err(e) => bail!(ErrorKind::DecodingError(e.into_owned())),
         },
         None => bail!(ErrorKind::EncodingDetectionError),
