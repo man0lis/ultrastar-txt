@@ -3,6 +3,7 @@ extern crate ultrastar_txt;
 use std::collections::HashMap;
 use ultrastar_txt::*;
 use url::Url;
+use std::path::Path;
 
 // usage:
 //    assert_error_kind!(some_err, ErrorKind::MyErrorType)
@@ -354,6 +355,20 @@ fn remote_url_audio() {
     assert_eq!(parse_txt_header_str(txt).unwrap(), header);
     assert_eq!(Source::parse("https://www.example.com/Testfile.mp3"), 
                Source::Remote(Url::parse("https://www.example.com/Testfile.mp3").unwrap()));
+}
+
+#[test]
+fn encoding_header_tag() {
+    let txt = read_file_to_string(Path::new("tests/txts/encoding_header_tag.txt")).unwrap();
+    let header = parse_txt_header_str(txt.as_ref()).unwrap();
+    assert_eq!(header.audio_path, Source::parse("petit milady - 360° Hoshi no Orchestra (TV).mp3"))
+}
+
+#[test]
+fn encoding_misidentified() {
+    let txt = read_file_to_string(Path::new("tests/txts/encoding_misidentified.txt")).unwrap();
+    let header = parse_txt_header_str(txt.as_ref()).unwrap();
+    assert_eq!(header.audio_path, Source::parse("petit milady - 360째 Hoshi no Orchestra (TV).mp3"))
 }
 
 fn get_simple_txt_str() -> &'static str {
