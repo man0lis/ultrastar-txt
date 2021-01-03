@@ -37,7 +37,8 @@ error_chain! {
     }
 }
 
-fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
+#[doc(hidden)]
+pub fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
     let p = p.as_ref();
     let mut f = File::open(p).chain_err(|| ErrorKind::IOError)?;
     let mut reader: Vec<u8> = Vec::new();
