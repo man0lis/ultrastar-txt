@@ -81,6 +81,51 @@ fn value_error_in_header_year() {
 }
 
 #[test]
+fn value_error_in_header_medleystart() {
+    let txt = include_str!("txts/value_error_in_header_medleystart.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ValueError(7, "MEDLEYSTARTBEAT")
+    );
+}
+
+#[test]
+fn value_error_in_header_medleyend() {
+    let txt = include_str!("txts/value_error_in_header_medleyend.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ValueError(7, "MEDLEYENDBEAT")
+    );
+}
+
+#[test]
+fn value_error_in_header_previewstart() {
+    let txt = include_str!("txts/value_error_in_header_previewstart.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ValueError(7, "PREVIEWSTART")
+    );
+}
+
+#[test]
+fn value_error_in_header_start() {
+    let txt = include_str!("txts/value_error_in_header_start.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ValueError(7, "START")
+    );
+}
+
+#[test]
+fn value_error_in_header_end() {
+    let txt = include_str!("txts/value_error_in_header_end.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::ValueError(7, "END")
+    );
+}
+
+#[test]
 fn unknown_note_type() {
     let txt = include_str!("txts/unknown_note_type.txt");
     assert_error_kind!(
@@ -225,6 +270,78 @@ fn duplicate_header_videogap() {
 }
 
 #[test]
+fn duplicate_header_album() {
+    let txt = include_str!("txts/duplicate_header_album.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(4, "ALBUM")
+    );
+}
+
+#[test]
+fn duplicate_header_medleystart() {
+    let txt = include_str!("txts/duplicate_header_medleystart.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(14, "MEDLEYSTARTBEAT")
+    );
+}
+
+#[test]
+fn duplicate_header_medleyend() {
+    let txt = include_str!("txts/duplicate_header_medleyend.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(15, "MEDLEYENDBEAT")
+    );
+}
+
+#[test]
+fn duplicate_header_previewstart() {
+    let txt = include_str!("txts/duplicate_header_previewstart.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(16, "PREVIEWSTART")
+    );
+}
+
+#[test]
+fn duplicate_header_start() {
+    let txt = include_str!("txts/duplicate_header_start.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(17, "START")
+    );
+}
+
+#[test]
+fn duplicate_header_end() {
+    let txt = include_str!("txts/duplicate_header_end.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(18, "END")
+    );
+}
+
+#[test]
+fn duplicate_header_duetsingerp1() {
+    let txt = include_str!("txts/duplicate_header_duetsingerp1.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(22, "DUETSINGERP1")
+    );
+}
+
+#[test]
+fn duplicate_header_duetsingerp2() {
+    let txt = include_str!("txts/duplicate_header_duetsingerp2.txt");
+    assert_error_kind!(
+        parse_txt_header_str(txt).err().unwrap(),
+        ultrastar_txt::parser::ErrorKind::DuplicateHeader(23, "DUETSINGERP2")
+    );
+}
+
+#[test]
 fn missing_end_indicator() {
     let txt = include_str!("txts/missing_end.txt");
     assert_error_kind!(
@@ -238,8 +355,7 @@ fn survive_nonstandard_tags() {
     let txt = include_str!("txts/survive_nonstandard_tags.txt");
     let mut header = get_simple_txt_header();
     let mut unknown = HashMap::new();
-    unknown.insert(String::from("MedleyStartBeat"), String::from("550"));
-    unknown.insert(String::from("MedleyEndBeat"), String::from("863"));
+    unknown.insert(String::from("ENCODING"), String::from("utf-8"));
     header.unknown = Some(unknown);
     assert_eq!(parse_txt_header_str(txt).unwrap(), header);
 }
@@ -320,8 +436,14 @@ fn empty_optional_tags() {
     header.video_gap = None;
     header.genre = None;
     header.edition = None;
+    header.album = None;
     header.language = None;
     header.year = None;
+    header.medley_start_beat = None;
+    header.medley_end_beat = None;
+    header.preview_start = None;
+    header.start = None;
+    header.end = None;
     header.unknown = None;
     assert_eq!(parse_txt_header_str(txt).unwrap(), header);
 }
@@ -330,6 +452,118 @@ fn empty_optional_tags() {
 fn generate_and_reparse_song() {
     let orig_txt_header = get_simple_txt_header();
     let orig_txt_lines = get_simple_txt_lines();
+
+    let generated_txt = generate_song_txt(&orig_txt_header, &orig_txt_lines).unwrap();
+    let parsed_header = parse_txt_header_str(generated_txt.as_ref()).unwrap();
+    let parsed_lines = parse_txt_lines_str(generated_txt.as_ref()).unwrap();
+
+    assert_eq!(parsed_header, orig_txt_header);
+    assert_eq!(parsed_lines, orig_txt_lines);
+}
+
+#[test]
+fn generate_and_reparse_duet() {
+    let orig_txt_header = Header {
+        artist: String::from("Testsong"),
+        title: String::from("Testartist"),
+        bpm: 123.0,
+        audio_path: Source::parse("Testfile.mp3"),
+        gap: Some(666.0),
+        cover_path: None,
+        background_path: None,
+        video_path: None,
+        video_gap: None,
+        genre: None,
+        edition: None,
+        album: None,
+        language: None,
+        year: None,
+        medley_start_beat: None,
+        medley_end_beat: None,
+        preview_start: None,
+        start: None,
+        end: None,
+        duet_singer_p1: Some(String::from("Me")),
+        duet_singer_p2: Some(String::from("Myself")),
+        relative: None,
+        unknown: None
+    };
+    let orig_txt_lines = vec![
+        Line {
+            start: 0,
+            rel: None,
+            notes: vec![
+                Note::PlayerChange { player: 1 },
+                Note::Regular {
+                    start: 0,
+                    duration: 4,
+                    pitch: -1,
+                    text: String::from("Test "),
+                },
+                Note::Regular {
+                    start: 4,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("I"),
+                },
+                Note::Regular {
+                    start: 8,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("'m "),
+                },
+                Note::Golden {
+                    start: 12,
+                    duration: 2,
+                    pitch: 59,
+                    text: String::from("test"),
+                },
+                Note::Regular {
+                    start: 16,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("ing."),
+                },
+            ],
+        },
+        Line {
+            start: 20,
+            rel: None,
+            notes: vec![
+                Note::PlayerChange { player: 2 },
+                Note::Regular {
+                    start: 24,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("Test "),
+                },
+                Note::Regular {
+                    start: 28,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("I"),
+                },
+                Note::Regular {
+                    start: 32,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("'m "),
+                },
+                Note::Freestyle {
+                    start: 36,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("test"),
+                },
+                Note::Freestyle {
+                    start: 40,
+                    duration: 4,
+                    pitch: 59,
+                    text: String::from("ing."),
+                },
+            ],
+        },
+    ];
 
     let generated_txt = generate_song_txt(&orig_txt_header, &orig_txt_lines).unwrap();
     let parsed_header = parse_txt_header_str(generated_txt.as_ref()).unwrap();
@@ -374,8 +608,16 @@ fn get_simple_txt_header() -> Header {
         video_gap: Some(777.0),
         genre: Some(String::from("Music")),
         edition: Some(String::from("Testmusic")),
+        album: Some(String::from("Testalbum")),
         language: Some(String::from("en")),
         year: Some(1337),
+        medley_start_beat: Some(12),
+        medley_end_beat: Some(20),
+        preview_start: Some(24.0),
+        start: Some(0.0),
+        end: Some(22000.0),
+        duet_singer_p1: None,
+        duet_singer_p2: None,
         unknown: None,
     }
 }

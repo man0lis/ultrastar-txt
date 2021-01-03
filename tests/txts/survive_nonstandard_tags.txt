@@ -1,5 +1,6 @@
 #TITLE:Testsong
 #ARTIST:Testartist
+#ALBUM:Testalbum
 #MP3:Testfile.mp3
 #GENRE:Music
 #EDITION:Testmusic
@@ -7,13 +8,17 @@
 #BACKGROUND:BG.jpg
 #VIDEO:DLzxrzFCyOs.mp4
 #VIDEOGAP:777
+#MEDLEYSTARTBEAT:12
+#MEDLEYENDBEAT:20
+#PREVIEWSTART:24
+#START:0
+#END:22000
 #RELATIVE:NO
 #LANGUAGE:en
 #YEAR:1337
-#MedleyStartBeat:550
-#MedleyEndBeat:863
 #BPM:123
 #GAP:666
+#ENCODING:utf-8
 : 0 4 59 Test 
 : 4 4 59 I
 : 8 4 59 'm 

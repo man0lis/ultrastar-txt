@@ -3,6 +3,8 @@
 #MP3:Testfile.mp3
 #GAP:666
 #BPM:123
+#DUETSINGERP1:Me
+#DIETSINGERP2:Myself
 P1
 : 0 4 -1 Test 
 : 4 4 59 I
