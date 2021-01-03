@@ -439,8 +439,8 @@ fn empty_optional_tags() {
     header.album = None;
     header.language = None;
     header.year = None;
-    header.medley_start = None;
-    header.medley_end = None;
+    header.medley_start_beat = None;
+    header.medley_end_beat = None;
     header.preview_start = None;
     header.start = None;
     header.end = None;
@@ -478,13 +478,13 @@ fn generate_and_reparse_duet() {
         album: None,
         language: None,
         year: None,
-        medley_start: None,
-        medley_end: None,
+        medley_start_beat: None,
+        medley_end_beat: None,
         preview_start: None,
         start: None,
         end: None,
-        duet_singer1: Some(String::from("Me")),
-        duet_singer2: Some(String::from("Myself")),
+        duet_singer_p1: Some(String::from("Me")),
+        duet_singer_p2: Some(String::from("Myself")),
         relative: None,
         unknown: None
     };
@@ -611,13 +611,13 @@ fn get_simple_txt_header() -> Header {
         album: Some(String::from("Testalbum")),
         language: Some(String::from("en")),
         year: Some(1337),
-        medley_start: Some(12),
-        medley_end: Some(20),
+        medley_start_beat: Some(12),
+        medley_end_beat: Some(20),
         preview_start: Some(24.0),
         start: Some(0.0),
         end: Some(22000.0),
-        duet_singer1: None,
-        duet_singer2: None,
+        duet_singer_p1: None,
+        duet_singer_p2: None,
         unknown: None,
     }
 }

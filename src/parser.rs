@@ -63,13 +63,13 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
     let mut opt_language = None;
     let mut opt_year = None;
     let mut opt_relative = None;
-    let mut opt_medley_start = None;
-    let mut opt_medley_end = None;
+    let mut opt_medley_start_beat = None;
+    let mut opt_medley_end_beat = None;
     let mut opt_preview_start = None;
     let mut opt_start = None;
     let mut opt_end = None;
-    let mut opt_duet_singer1 = None;
-    let mut opt_duet_singer2 = None;
+    let mut opt_duet_singer_p1 = None;
+    let mut opt_duet_singer_p2 = None;
     let mut opt_unknown: Option<HashMap<String, String>> = None;
 
     lazy_static! {
@@ -225,8 +225,8 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
                 }
             }
             "MEDLEYSTARTBEAT" => {
-                if opt_medley_start.is_none() {
-                    opt_medley_start = match value.trim().replace(",", ".").parse() {
+                if opt_medley_start_beat.is_none() {
+                    opt_medley_start_beat = match value.trim().replace(",", ".").parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
                             bail!(ErrorKind::ValueError(line_count, "MEDLEYSTARTBEAT"));
@@ -237,8 +237,8 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
                 }
             }
             "MEDLEYENDBEAT" => {
-                if opt_medley_end.is_none() {
-                    opt_medley_end = match value.trim().replace(",", ".").parse() {
+                if opt_medley_end_beat.is_none() {
+                    opt_medley_end_beat = match value.trim().replace(",", ".").parse() {
                         Ok(x) => Some(x),
                         Err(_) => {
                             bail!(ErrorKind::ValueError(line_count, "MEDLEYENDBEAT"));
@@ -285,15 +285,15 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
                 }
             }
             "P1" | "DUETSINGERP1" => {
-                if opt_duet_singer1.is_none() {
-                    opt_duet_singer1 = Some(String::from(value));
+                if opt_duet_singer_p1.is_none() {
+                    opt_duet_singer_p1 = Some(String::from(value));
                 } else {
                     bail!(ErrorKind::DuplicateHeader(line_count, "DUETSINGERP1"));
                 }
             }
             "P2" | "DUETSINGERP2" => {
-                if opt_duet_singer2.is_none() {
-                    opt_duet_singer2 = Some(String::from(value));
+                if opt_duet_singer_p2.is_none() {
+                    opt_duet_singer_p2 = Some(String::from(value));
                 } else {
                     bail!(ErrorKind::DuplicateHeader(line_count, "DUETSINGERP2"));
                 }
@@ -339,13 +339,13 @@ pub fn parse_txt_header_str(txt_str: &str) -> Result<Header> {
             album: opt_album,
             language: opt_language,
             year: opt_year,
-            medley_start: opt_medley_start,
-            medley_end: opt_medley_end,
+            medley_start_beat: opt_medley_start_beat,
+            medley_end_beat: opt_medley_end_beat,
             preview_start: opt_preview_start,
             start: opt_start,
             end: opt_end,
-            duet_singer1: opt_duet_singer1,
-            duet_singer2: opt_duet_singer2,
+            duet_singer_p1: opt_duet_singer_p1,
+            duet_singer_p2: opt_duet_singer_p2,
             relative: opt_relative,
             unknown: opt_unknown,
         };

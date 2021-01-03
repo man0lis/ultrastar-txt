@@ -85,9 +85,9 @@ pub struct Header {
     /// the year the song is from
     pub year: Option<u32>,
     /// the start in the medley modus om beats
-    pub medley_start: Option<i32>,
+    pub medley_start_beat: Option<i32>,
     /// the end in the medley modus om beats
-    pub medley_end: Option<i32>,
+    pub medley_end_beat: Option<i32>,
     /// the start of the in seconds
     pub preview_start: Option<f32>,
     /// the start of the song in seconds (doesn't affect gap or synchronization)
@@ -95,25 +95,18 @@ pub struct Header {
     /// the end of the song in milliseconds
     pub end: Option<f32>,
     /// the name of the first singer in a duet
-    pub duet_singer1: Option<String>,
+    pub duet_singer_p1: Option<String>,
     /// the name of the second singer in a duet
-    pub duet_singer2: Option<String>,
+    pub duet_singer_p2: Option<String>,
 
     /* header fields todo
     // these are header fields parsed by ultrastar deluxe
     // they might be added if the need arises or my understanding of them grows
     pub creator: Option<String>,  // CREATOR
-    pub start: Option<f32>,       // START
-    pub end: Option<i32>,         // END
     pub resolution: Option<i32>,  // RESOLUTION
     pub notes_gap: Option<i32>,   // NOTESGAP
     pub encoding: Option<String>, // ENCODING
-    pub preview_start: Option<i32>, // PREVIEWSTART
-    pub medley_start_beat: Option<i32>, // MEDLEYSTARTBEAT
-    pub medley_end_beat: Option<i32>,   // MEDLEYENDBEAT
     pub calc_medley: Option<Bool>,      // CALCMEDLEY
-    pub duet_singer_p1: Option<String>, // DUETSINGERP1 / P1
-    pub duet_singer_p2: Option<String>, // DUETSINGERP2 / P2:
     */
     /// is the timing format of the song relative
     pub relative: Option<bool>,

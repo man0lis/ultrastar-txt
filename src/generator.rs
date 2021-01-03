@@ -56,11 +56,11 @@ pub fn generate_song_txt(header: &Header, lines: &[Line]) -> Result<String> {
     if let Some(videogap) = header.video_gap {
         song_txt_str.push_str(&format!("#VIDEOGAP:{}\n", videogap));
     }
-    if let Some(medley_start) = header.medley_start {
-        song_txt_str.push_str(&format!("#MEDLEYSTARTBEAT:{}\n", medley_start));
+    if let Some(medley_start_beat) = header.medley_start_beat {
+        song_txt_str.push_str(&format!("#MEDLEYSTARTBEAT:{}\n", medley_start_beat));
     }
-    if let Some(medley_end) = header.medley_end {
-        song_txt_str.push_str(&format!("#MEDLEYENDBEAT:{}\n", medley_end));
+    if let Some(medley_end_beat) = header.medley_end_beat {
+        song_txt_str.push_str(&format!("#MEDLEYENDBEAT:{}\n", medley_end_beat));
     }
     if let Some(preview_start) = header.preview_start {
         song_txt_str.push_str(&format!("#PREVIEWSTART:{}\n", preview_start));
@@ -90,11 +90,11 @@ pub fn generate_song_txt(header: &Header, lines: &[Line]) -> Result<String> {
             song_txt_str.push_str("#RELATIVE:NO\n");
         }
     }
-    if let Some(duet_singerp1) = header.duet_singer1.clone() {
-        song_txt_str.push_str(&format!("#DUETSINGERP1:{}\n", duet_singerp1));
+    if let Some(duet_singer_p1) = header.duet_singer_p1.clone() {
+        song_txt_str.push_str(&format!("#DUETSINGERP1:{}\n", duet_singer_p1));
     }
-    if let Some(duet_singerp2) = header.duet_singer2.clone() {
-        song_txt_str.push_str(&format!("#DUETSINGERP2:{}\n", duet_singerp2));
+    if let Some(duet_singer_p2) = header.duet_singer_p2.clone() {
+        song_txt_str.push_str(&format!("#DUETSINGERP2:{}\n", duet_singer_p2));
     }
     if let Some(unknown) = header.unknown.clone() {
         for (key, value) in unknown.iter() {
