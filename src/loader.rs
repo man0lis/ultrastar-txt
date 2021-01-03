@@ -6,6 +6,7 @@ use crate::structs::{TXTSong, Source};
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use regex::Regex;
 
 error_chain! {
     errors {
@@ -37,17 +38,34 @@ error_chain! {
     }
 }
 
-fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
+#[doc(hidden)]
+pub fn read_file_to_string<P: AsRef<Path>>(p: P) -> Result<String> {
     let p = p.as_ref();
     let mut f = File::open(p).chain_err(|| ErrorKind::IOError)?;
     let mut reader: Vec<u8> = Vec::new();
     f.read_to_end(&mut reader)
         .chain_err(|| ErrorKind::IOError)?;
 
-    // detect encoding and decode to String
-    let chardet_result = chardet::detect(&reader);
-    let whtwg_label = chardet::charset2encoding(&chardet_result.0);
-    let coder = encoding::label::encoding_from_whatwg_label(whtwg_label);
+    // decode as ascii and search for ENCODING Header
+    let test_coder = encoding::label::encoding_from_whatwg_label("ascii").unwrap();
+    let test_content = match test_coder.decode(&reader, encoding::DecoderTrap::Ignore) {
+        Ok(x) => x,
+        Err(e) => bail!(ErrorKind::DecodingError(e.into_owned())),
+    };
+    let mut whtwg_label = String::new();
+    match Regex::new(r"#ENCODING:([A-Za-z0-9\-_:.]+)\s*\n").unwrap().captures(&test_content) {
+        Some(cap) => {
+            // get encoding from header
+            whtwg_label.push_str(cap.get(1).unwrap().as_str());
+        },
+        None => {
+            // detect encoding
+            let chardet_result = chardet::detect(&reader);
+            whtwg_label.push_str(chardet::charset2encoding(&chardet_result.0));
+        },
+    };
+    // decode to String
+    let coder = encoding::label::encoding_from_whatwg_label(&whtwg_label);
     let file_content = match coder {
         Some(c) => match c.decode(&reader, encoding::DecoderTrap::Ignore) {
             Ok(x) => x,
